@@ -5,6 +5,7 @@ import heapq
 from collections.abc import Callable
 
 from qetwork.events.event import Event
+from qetwork.kernel.state_tracker.tracker import StateTracker
 
 class Timeline:
     def __init__(self, stop_time:float = math.inf) -> None:
@@ -13,7 +14,8 @@ class Timeline:
         self.is_running: bool = False
         self.run_counter: int = 0
         self.queue: list = []
-        self.counter: int = 0
+        self._counter: int = 0
+        self.state_tracker = StateTracker()
 
     def now(self) -> int:
         return self.time
@@ -21,8 +23,8 @@ class Timeline:
     def schedule(self, action: Callable, *args, at: int, delay: int = 0, priority: int = 0, **kwargs) -> Event:
         time = at + delay
         event = Event(time, action, args, kwargs, priority)
-        heapq.heappush(self.queue, (event.time, event.priority, self.counter, event))
-        self.counter += 1
+        heapq.heappush(self.queue, (event.time, event.priority, self._counter, event))
+        self._counter += 1
         return event
     
     def run(self) -> None:
