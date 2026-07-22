@@ -15,7 +15,8 @@ re-solves (cycle-guarded); an edge with no distinct path left gets None.
 generate_paths: nx.shortest_simple_paths (Yen) yields simple S-T paths in
 nondecreasing hop order; the first max_paths are kept.
 
-generate_datasets: runs both on one topology and writes
+generate_datasets: runs both on one topology and writes, under
+<name>_raw_paths/ in out_dir:
     <name>_prior.csv    every assigned max-flow path
     <name>_train.csv    9/10 of the enumerated paths (seeded random split)
     <name>_test.csv     the remaining 1/10
@@ -195,10 +196,12 @@ def _validate(paths: list[list[str]], spec: TopologySpec, label: str) -> None:
 
 def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
                       seed: int | None = None, out_dir=None) -> dict[str, Path]:
-    """Write <name>_prior.csv, <name>_train.csv, <name>_test.csv; return their paths.
+    """Write <name>_raw_paths/<name>_{prior,train,test}.csv under out_dir;
+    return the CSV paths.
 
     out_dir defaults to the topology file's directory (cwd if a TopologySpec
-    object was passed instead of a file)."""
+    object was passed instead of a file); the <name>_raw_paths subdirectory
+    is created if missing."""
     spec = _as_spec(topology)
     if out_dir is None:
         out_dir = Path.cwd() if isinstance(topology, TopologySpec) \
@@ -206,6 +209,8 @@ def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
     out_dir = Path(out_dir)
     if not out_dir.is_dir():
         raise ValueError(f"out_dir {out_dir} is not an existing directory")
+    raw_dir = out_dir / f"{spec.name}_raw_paths"
+    raw_dir.mkdir(exist_ok=True)
 
     per_edge = max_flow_paths(spec)
     prior = [p for p in per_edge.values() if p is not None]
@@ -222,9 +227,9 @@ def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
     train = [p for i, p in enumerate(enum) if i not in test_idx]
     test = [p for i, p in enumerate(enum) if i in test_idx]
 
-    outs = {"prior": out_dir / f"{spec.name}_prior.csv",
-            "train": out_dir / f"{spec.name}_train.csv",
-            "test": out_dir / f"{spec.name}_test.csv"}
+    outs = {"prior": raw_dir / f"{spec.name}_prior.csv",
+            "train": raw_dir / f"{spec.name}_train.csv",
+            "test": raw_dir / f"{spec.name}_test.csv"}
     write_paths_csv(prior, outs["prior"])
     write_paths_csv(train, outs["train"])
     write_paths_csv(test, outs["test"])

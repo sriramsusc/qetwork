@@ -1,8 +1,9 @@
 """run: full pipeline — topology -> path sets -> error-stamped datasets.
 
 Stage 1 writes grid10x10.json into qetwork/topologies/, stage 2 writes
-<name>_{prior,train,test}.csv next to it, stage 3 reads those and writes
-<name>_{prior,train,test}_datasets.csv plus snapshots/<name>_ds<k>.json."""
+<name>_raw_paths/<name>_{prior,train,test}.csv next to it, stage 3 reads
+those and writes <name>_error_datasets/ next to it: <name>_{prior,test}_datasets.csv,
+one <name>_train_ds<k>_datasets.csv per DatasetID, plus snapshots/<name>_ds<k>.json."""
 
 import time
 from pathlib import Path

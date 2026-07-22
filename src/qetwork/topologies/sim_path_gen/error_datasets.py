@@ -2,15 +2,18 @@
 
 Each DatasetID is one network snapshot: every varying parameter is drawn once
 per node / edge / detector from the physically-cited RANGES below, written out
-twice:
+twice, under <name>_error_datasets/ in out_dir:
   snapshots/<name>_ds<k>.json      the full spec with sampled values substituted
                                    (schema-valid: materialize it to simulate)
-  <name>_<kind>_datasets.csv       one row per (DatasetID, path) for each of
-                                   prior/train/test, carrying every varied
-                                   parameter: per-node and per-edge |-joined
-                                   lists in path order, detector values as
-                                   dataset-level columns
-Within a DatasetID every row reads the same snapshot, across all three files."""
+  <name>_<kind>_datasets.csv       one row per (DatasetID, path), carrying
+                                   every varied parameter: per-node and
+                                   per-edge |-joined lists in path order,
+                                   detector values as dataset-level columns;
+                                   prior and test span all DatasetIDs in one
+                                   CSV each, train (the largest) is split into
+                                   <name>_train_ds<k>_datasets.csv, one per
+                                   DatasetID
+Within a DatasetID every row reads the same snapshot, across all files."""
 
 import copy
 import json
@@ -31,7 +34,8 @@ RANGES = {
     # -- node: gate errors
     "p_depol_1q":     (1e-5, 1e-3, "log"),  # 1q error 1e-6 (ion, Harty et al., PRL 113, 220501 (2014)) to ~1e-3 (SC, Krantz et al., APR 6, 021318 (2019))
     "p_depol_2q":     (1e-4, 1e-2, "log"),  # 2q 99.9% ion (Ballance et al., PRL 117, 060504 (2016)); 99-99.7% SC
-    "p_depol_swap":   (3e-4, 3e-2, "log"),  # SWAP = 3 CNOTs -> ~3x 2q error
+    # p_depol_swap is no longer sampled: SWAP error is derived in hardware as
+    # SWAP_DEPOL_FACTOR (1.3) * p_depol_2q -- see roles.RepeaterNode
     "coh1_angle":     (0.0, 0.05, "lin"),   # residual 1q calibration error, ~1% of pi/2 (Krantz et al. 2019)
     "coh2_zz_angle":  (0.0, 0.05, "lin"),   # residual ZZ crosstalk (Krantz et al. 2019)
     # -- node: SFWM source
@@ -53,7 +57,7 @@ RANGES = {
     "insertion_loss_db": (0.1, 1.0, "lin"), # connector/splice IL 0.1-0.5 dB per mated pair (IEC 61300-3-34), 1-2 per link
 }
 
-_NODE_FIELDS = ["t1", "t2", "p_depol_1q", "p_depol_2q", "p_depol_swap",
+_NODE_FIELDS = ["t1", "t2", "p_depol_1q", "p_depol_2q",
                 "coh1_angle", "coh2_zz_angle", "src_visibility", "src_phase"]
 _EDGE_FIELDS = ["length", "attenuation", "insertion_loss_db"]
 _DET_FIELDS = ["coupling_1", "coupling_2", "mzi_phase_error", "mzi_loss_short",
@@ -75,7 +79,6 @@ def _sample_node(rng) -> dict[str, float]:
     return {"t1": t1, "t2": t1 * _draw(rng, "t2_frac"),
             "p_depol_1q": _draw(rng, "p_depol_1q"),
             "p_depol_2q": _draw(rng, "p_depol_2q"),
-            "p_depol_swap": _draw(rng, "p_depol_swap"),
             "coh1_angle": _draw(rng, "coh1_angle"),
             "coh2_zz_angle": _draw(rng, "coh2_zz_angle"),
             "src_visibility": _draw(rng, "src_visibility"),
@@ -116,7 +119,6 @@ def sample_snapshot(base: dict, rng) -> tuple[dict, dict, dict, dict]:
         node["t1"], node["t2"] = v["t1"], v["t2"]
         node["gates"]["p_depol_1q"] = v["p_depol_1q"]
         node["gates"]["p_depol_2q"] = v["p_depol_2q"]
-        node["gates"]["p_depol_swap"] = v["p_depol_swap"]
         node["gates"]["coherent_1q"]["angle"] = v["coh1_angle"]
         node["gates"]["coherent_2q"]["zz_angle"] = v["coh2_zz_angle"]
         node["source"]["visibility"] = v["src_visibility"]
@@ -158,24 +160,33 @@ def _g(x: float) -> str:
 
 def generate_error_datasets(topology, *, n_datasets: int = N_DATASETS,
                             seed: int | None = None, paths_dir=None,
-                            out_dir=None) -> dict[str, Path]:
+                            out_dir=None) -> dict[str, Path | list[Path]]:
     """Sample n_datasets snapshots; stamp prior/train/test path sets with them.
 
-    Reads <name>_{prior,train,test}.csv from paths_dir (default: the topology
-    file's directory), writes snapshots/<name>_ds<k>.json and
-    <name>_<kind>_datasets.csv into out_dir (default: paths_dir)."""
+    Reads <name>_{prior,train,test}.csv from paths_dir (default: the
+    <name>_raw_paths directory next to the topology file), writes the
+    <name>_error_datasets subdirectory under out_dir (default: the topology
+    file's directory) holding snapshots/<name>_ds<k>.json,
+    <name>_{prior,test}_datasets.csv, and one <name>_train_ds<k>_datasets.csv
+    per DatasetID. Returns {"prior": Path, "train": [Path, ...], "test": Path}."""
     if n_datasets < 1:
         raise ValueError(f"n_datasets must be positive, got {n_datasets}")
     spec = TopologySpec.from_json(topology) if not isinstance(topology, TopologySpec) else topology
     base = spec.to_dict()
+    topo_dir = Path.cwd() if isinstance(topology, TopologySpec) \
+        else Path(topology).resolve().parent
     if paths_dir is None:
-        paths_dir = Path.cwd() if isinstance(topology, TopologySpec) \
-            else Path(topology).resolve().parent
+        paths_dir = topo_dir / f"{spec.name}_raw_paths"
     paths_dir = Path(paths_dir)
-    out_dir = paths_dir if out_dir is None else Path(out_dir)
+    if not paths_dir.is_dir():
+        raise ValueError(
+            f"paths_dir {paths_dir} not found; run path generation first")
+    out_dir = topo_dir if out_dir is None else Path(out_dir)
     if not out_dir.is_dir():
         raise ValueError(f"out_dir {out_dir} is not an existing directory")
-    snap_dir = out_dir / "snapshots"
+    err_dir = out_dir / f"{spec.name}_error_datasets"
+    err_dir.mkdir(exist_ok=True)
+    snap_dir = err_dir / "snapshots"
     snap_dir.mkdir(exist_ok=True)
 
     edge_by_pair = {frozenset((e["u"], e["v"])): ename
@@ -197,28 +208,45 @@ def generate_error_datasets(topology, *, n_datasets: int = N_DATASETS,
             json.dump(snap, f, indent=2, allow_nan=False)
         snapshots.append((node_vals, edge_vals, det_vals))
 
+    def write_snapshot(f, d: int, snap, rows) -> None:
+        """Every path in rows stamped with snapshot d, one CSV row each."""
+        node_vals, edge_vals, det_vals = snap
+        det_part = "," + ",".join(
+            _g(det_vals[dn][fld]) for dn in det_names for fld in _DET_FIELDS
+        ) if det_names else ""
+        for pid, pstr in rows:
+            nodes = pstr.split("->")
+            hops = [edge_by_pair[frozenset(h)] for h in zip(nodes, nodes[1:])]
+            node_part = ",".join(
+                "|".join(_g(node_vals[n][fld]) for n in nodes)
+                for fld in _NODE_FIELDS)
+            edge_part = ",".join(
+                "|".join(_g(edge_vals[e][fld]) for e in hops)
+                for fld in _EDGE_FIELDS)
+            f.write(f"{d},{pid},{pstr},{node_part},{edge_part}{det_part}\n")
+
     outs = {}
     for kind in ("prior", "train", "test"):
         rows = _read_paths_csv(paths_dir / f"{spec.name}_{kind}.csv")
-        out = out_dir / f"{spec.name}_{kind}_datasets.csv"
-        with open(out, "w") as f:
-            f.write(header + "\n")
-            for d, (node_vals, edge_vals, det_vals) in enumerate(snapshots):
-                det_part = "," + ",".join(
-                    _g(det_vals[dn][fld]) for dn in det_names for fld in _DET_FIELDS
-                ) if det_names else ""
-                for pid, pstr in rows:
-                    nodes = pstr.split("->")
-                    hops = [edge_by_pair[frozenset(h)] for h in zip(nodes, nodes[1:])]
-                    node_part = ",".join(
-                        "|".join(_g(node_vals[n][fld]) for n in nodes)
-                        for fld in _NODE_FIELDS)
-                    edge_part = ",".join(
-                        "|".join(_g(edge_vals[e][fld]) for e in hops)
-                        for fld in _EDGE_FIELDS)
-                    f.write(f"{d},{pid},{pstr},{node_part},{edge_part}{det_part}\n")
-        outs[kind] = out
-        print(f"{kind}: {len(rows)} paths x {n_datasets} datasets -> {out}")
+        if kind == "train":
+            files = []
+            for d, snap in enumerate(snapshots):
+                out = err_dir / f"{spec.name}_train_ds{d}_datasets.csv"
+                with open(out, "w") as f:
+                    f.write(header + "\n")
+                    write_snapshot(f, d, snap, rows)
+                files.append(out)
+            outs["train"] = files
+            print(f"train: {len(rows)} paths x {n_datasets} datasets -> "
+                  f"{n_datasets} CSVs, {files[0].name} .. {files[-1].name}")
+        else:
+            out = err_dir / f"{spec.name}_{kind}_datasets.csv"
+            with open(out, "w") as f:
+                f.write(header + "\n")
+                for d, snap in enumerate(snapshots):
+                    write_snapshot(f, d, snap, rows)
+            outs[kind] = out
+            print(f"{kind}: {len(rows)} paths x {n_datasets} datasets -> {out}")
     print(f"snapshots: {n_datasets} spec files in {snap_dir}")
     return outs
 
