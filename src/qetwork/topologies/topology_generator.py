@@ -39,7 +39,6 @@ DEFAULT_NODE = {
     "gates": {
         "p_depol_1q": 0.0,
         "p_depol_2q": 0.0,
-        "p_depol_swap": 0.0,
         "coherent_1q": {"axis": "z", "angle": 0.0},
         "coherent_2q": {"zz_angle": 0.0},
         "durations": {"gate_1q": 0, "gate_2q": 0, "measure": 0},   # ps, ints

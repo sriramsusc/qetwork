@@ -24,10 +24,12 @@ from qetwork.components.snspd import SNSPD
 from qetwork.components.detector import TimeEnergyDetector
 
 
+SWAP_DEPOL_FACTOR = 1.3        # SWAP incoherent error relative to CNOT (p_depol_2q):
+                               # a compiled/native SWAP beats the naive 3-CNOT estimate
+
 _GATE_DEFAULTS = {
     "p_depol_1q": 0.0,
     "p_depol_2q": 0.0,
-    "p_depol_swap": 0.0,       # SWAP ~ 3 CNOTs; deserves its own incoherent knob
     "coherent_1q": {"axis": "z", "angle": 0.0},
     "coherent_2q": {"zz_angle": 0.0},
     "durations": {"gate_1q": 0, "gate_2q": 0, "measure": 0},   # ps, ints
@@ -98,7 +100,7 @@ class RepeaterNode(Node):
         if unknown:
             raise ValueError(f"unknown gate_cfg keys {unknown}")
         gates = {**_GATE_DEFAULTS, **(gate_cfg or {})}
-        for name in ("p_depol_1q", "p_depol_2q", "p_depol_swap"):
+        for name in ("p_depol_1q", "p_depol_2q"):
             if not 0 <= gates[name] <= 1:
                 raise ValueError(f"{name} must be in [0,1], got {gates[name]}")
         dur = gates["durations"]
@@ -117,7 +119,7 @@ class RepeaterNode(Node):
 
         self.p_depol_1q = gates["p_depol_1q"]
         self.p_depol_2q = gates["p_depol_2q"]
-        self.p_depol_swap = gates["p_depol_swap"]
+        self.p_depol_swap = min(1.0, SWAP_DEPOL_FACTOR * gates["p_depol_2q"])   # derived, not a knob
         self.coherent_1q = _coherent_1q(gates["coherent_1q"])
         self.coherent_2q = _coherent_2q(gates["coherent_2q"])
         self.source = SFWMSource(timeline, owner=self, **(source_cfg or {}))
@@ -139,7 +141,8 @@ class RepeaterNode(Node):
 
     @property
     def move_duration(self) -> int:
-        return 3 * self.t_gate_2q      # SWAP ~ 3 CNOTs, mirroring p_depol_swap
+        return 3 * self.t_gate_2q      # SWAP still occupies 3 CNOT slots in TIME; its
+                                       # incoherent error is SWAP_DEPOL_FACTOR * p_depol_2q
 
     @property
     def calibration_duration(self) -> int:

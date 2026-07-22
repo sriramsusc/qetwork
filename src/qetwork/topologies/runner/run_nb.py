@@ -68,7 +68,8 @@ PER_NODE = {
     "node_t1": ("t1",), "node_t2": ("t2",),
     "node_p_depol_1q": ("gates", "p_depol_1q"),
     "node_p_depol_2q": ("gates", "p_depol_2q"),
-    "node_p_depol_swap": ("gates", "p_depol_swap"),
+    # node_p_depol_swap in older CSVs is ignored: SWAP error is derived in hardware
+    # as SWAP_DEPOL_FACTOR (1.3) * p_depol_2q -- see roles.RepeaterNode
     "node_coh1_angle": ("gates", "coherent_1q", "angle"),
     "node_coh2_zz_angle": ("gates", "coherent_2q", "zz_angle"),
     "node_src_visibility": ("source", "visibility"),
