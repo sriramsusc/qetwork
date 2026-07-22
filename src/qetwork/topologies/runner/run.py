@@ -15,19 +15,19 @@ from qetwork.topologies.sim_path_gen.error_datasets import generate_error_datase
 TOPOLOGIES = Path(__file__).resolve().parent   # .../qetwork/topologies
 
 ROWS, COLS = 10, 10
-TOPO_SEED = 7                  # resolves lengths and roles at spec time
+TOPO_SEED = 7                  # resolves lengths at spec time (roles are pinned below)
+ROLES = ("n1", f"n{COLS}")     # top-left corner -> top-right corner
 QLINK_RANGE = (10.0, 100.0)
 SPLIT_SEED = None              # train/test split; None -> DEFAULT_SEED
-N_DATASETS = 50
+N_DATASETS = 15
 ERROR_SEED = None              # snapshot sampling; None -> DEFAULT_SEED
-
 
 def main() -> None:
     topo = TOPOLOGIES / f"grid{ROWS}x{COLS}.json"
 
     t0 = time.perf_counter()
     generate("grid", rows=ROWS, cols=COLS, seed=TOPO_SEED,
-             out_path=str(topo), qlink_length_range=QLINK_RANGE)
+             out_path=str(topo), qlink_length_range=QLINK_RANGE, roles=ROLES)
     print(f"[1/3] topology -> {topo}  ({time.perf_counter() - t0:.1f}s)")
 
     t0 = time.perf_counter()

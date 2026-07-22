@@ -1,11 +1,15 @@
-"""Batch network benchmarking over one error-stamped dataset CSV, with optional
+"""Batch network benchmarking over error-stamped dataset CSVs, with optional
 link-level purified hops.
 
-    python -m qetwork.topologies.runner.run_nb <incsv> <outcsv> \\
+    python -m qetwork.topologies.runner.run_nb <in> <out> \\
         [--purification] [--purification-rounds R] [--protocol seq|par] \\
         [--samples N] [--jobs J]
 
-Reads every row of <incsv>, rebuilds each path as a linear chain (per-node
+<in> is either one *_datasets.csv (then <out> is the results CSV) or a
+directory of them (then <out> is a directory; each X.csv lands as
+X_results.csv, and existing *_results.csv files are skipped as inputs).
+
+Reads every row of each input CSV, rebuilds each path as a linear chain (per-node
 gates/source/T1-T2 from the pipe-lists, per-edge fiber, and the endpoint
 MZI+SNSPD detectors from the d1_*/d2_* scalars), runs the event-driven
 NetworkBenchmark (Helsen & Wehner, arXiv:2103.01165), and writes ONE output CSV
@@ -62,6 +66,7 @@ SEED = 1                       # base seed; row i runs with SEED + i
 USE_DETECTOR = False            # MZI+SNSPD readout (False = exact readout)
 CALIBRATE = True               # per-pair source-phase calibration in purified hops
 MAX_ROUNDS = 5
+COLS = ["DatasetID", "PathID", "PathString", "path_fidelity", "avg_time_us"]
 
 # --- CSV pipe-list column -> where it lands in a node/edge spec ---
 PER_NODE = {
@@ -202,43 +207,26 @@ def _jobs_stream(incsv, base_cfg):
             yield row, {**base_cfg, "seed": SEED + idx}
 
 
-def main():
-    ap = argparse.ArgumentParser(
-        description="Batch network benchmarking over one dataset CSV, optionally with "
-                    "link-level purified hops.")
-    ap.add_argument("incsv", help="input *_datasets.csv file")
-    ap.add_argument("outcsv", help="output results CSV")
-    ap.add_argument("--purification", action="store_true",
-                    help="purify every hop's link (standard repeated DEJMPS pumping)")
-    ap.add_argument("--purification-rounds", type=int, default=None,
-                    help=f"pump level, 1..{MAX_ROUNDS} consecutive successes (default 1); "
-                         f"requires --purification")
-    ap.add_argument("--protocol", choices=("seq", "par"), default="seq",
-                    help="distribution protocol handed to the benchmark (reserved for the bounce)")
-    ap.add_argument("--samples", type=int, default=40,
-                    help="RB sequences per m (detector readout is one click/seq; raise for clean fits)")
-    ap.add_argument("--jobs", type=int, default=1,
-                    help="worker processes (0 = all cores); >1 writes rows in completion order")
-    args = ap.parse_args()
+def _result_name(incsv):
+    """grid-10x10-seed7_prior.csv -> grid-10x10-seed7_prior_results.csv"""
+    return os.path.splitext(os.path.basename(incsv))[0] + "_results.csv"
 
-    if not os.path.isfile(args.incsv):
-        ap.error(f"input CSV not found: {args.incsv}")
-    if args.purification_rounds is not None and not args.purification:
-        ap.error("--purification-rounds requires --purification")
-    rounds = 0
-    if args.purification:
-        rounds = 1 if args.purification_rounds is None else args.purification_rounds
-        if not 1 <= rounds <= MAX_ROUNDS:
-            ap.error(f"--purification-rounds must be in 1..{MAX_ROUNDS}, got {rounds}")
-    mode = SEQUENTIAL if args.protocol == "seq" else PARALLEL
-    jobs = args.jobs if args.jobs > 0 else (os.cpu_count() or 1)
 
-    base_cfg = {"rounds": rounds, "mode": mode, "samples": args.samples}
-    cols = ["DatasetID", "PathID", "PathString", "path_fidelity", "avg_time_us"]
+def _discover(indir):
+    """The dataset CSVs of one directory, sorted; *_results.csv outputs are
+    skipped so out-dir == in-dir round-trips cleanly."""
+    return [os.path.join(indir, n) for n in sorted(os.listdir(indir))
+            if n.endswith(".csv") and not n.endswith("_results.csv")]
 
+
+def process_file(incsv, outcsv, base_cfg, jobs):
+    """All rows of one dataset CSV -> one results CSV. Returns (n_ok, n_err).
+
+    Seeds restart at SEED + row index for every file, so each file's result
+    set is identical whether it runs alone or inside a directory batch."""
     n_ok = n_err = 0
-    with open(args.outcsv, "w", newline="") as fout:
-        w = csv.DictWriter(fout, fieldnames=cols)
+    with open(outcsv, "w", newline="") as fout:
+        w = csv.DictWriter(fout, fieldnames=COLS)
         w.writeheader()
 
         def emit(res):
@@ -255,7 +243,7 @@ def main():
             print(f"[{n_ok}] D{did} P{pid} ({len(pstr.split('->')) - 1} hops)  "
                   f"F={f_path:.4f}  t={avg_us:.2f}us")
 
-        work = _jobs_stream(args.incsv, base_cfg)
+        work = _jobs_stream(incsv, base_cfg)
         if jobs == 1:                                 # in-process: no pool overhead, plain tracebacks
             for job in work:
                 emit(_run_row(job))
@@ -270,7 +258,67 @@ def main():
                             emit(fut.result())
                 for fut in as_completed(pending):
                     emit(fut.result())
-    print(f"done: {n_ok} rows -> {args.outcsv}  ({n_err} errors)")
+    return n_ok, n_err
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        description="Batch network benchmarking over dataset CSVs, optionally with "
+                    "link-level purified hops.")
+    ap.add_argument("incsv", help="input *_datasets.csv file, or a directory of them")
+    ap.add_argument("outcsv", help="output results CSV, or a directory when the input is one")
+    ap.add_argument("--purification", action="store_true",
+                    help="purify every hop's link (standard repeated DEJMPS pumping)")
+    ap.add_argument("--purification-rounds", type=int, default=None,
+                    help=f"pump level, 1..{MAX_ROUNDS} consecutive successes (default 1); "
+                         f"requires --purification")
+    ap.add_argument("--protocol", choices=("seq", "par"), default="seq",
+                    help="distribution protocol handed to the benchmark (reserved for the bounce)")
+    ap.add_argument("--samples", type=int, default=40,
+                    help="RB sequences per m (detector readout is one click/seq; raise for clean fits)")
+    ap.add_argument("--jobs", type=int, default=1,
+                    help="worker processes (0 = all cores); >1 writes rows in completion order")
+    args = ap.parse_args()
+
+    if args.purification_rounds is not None and not args.purification:
+        ap.error("--purification-rounds requires --purification")
+    rounds = 0
+    if args.purification:
+        rounds = 1 if args.purification_rounds is None else args.purification_rounds
+        if not 1 <= rounds <= MAX_ROUNDS:
+            ap.error(f"--purification-rounds must be in 1..{MAX_ROUNDS}, got {rounds}")
+    mode = SEQUENTIAL if args.protocol == "seq" else PARALLEL
+    jobs = args.jobs if args.jobs > 0 else (os.cpu_count() or 1)
+
+    base_cfg = {"rounds": rounds, "mode": mode, "samples": args.samples}
+
+    if os.path.isdir(args.incsv):
+        if os.path.isfile(args.outcsv):
+            ap.error(f"input is a directory, so output must be one too: {args.outcsv}")
+        pairs = [(f, os.path.join(args.outcsv, _result_name(f)))
+                 for f in _discover(args.incsv)]
+        if not pairs:
+            ap.error(f"no dataset *.csv files in {args.incsv}")
+        os.makedirs(args.outcsv, exist_ok=True)
+    elif os.path.isfile(args.incsv):
+        pairs = [(args.incsv, args.outcsv)]
+    else:
+        ap.error(f"input not found: {args.incsv}")
+
+    bad = []
+    for i, (incsv, outcsv) in enumerate(pairs):
+        if len(pairs) > 1:
+            print(f"=== [{i + 1}/{len(pairs)}] {incsv}")
+        try:
+            n_ok, n_err = process_file(incsv, outcsv, base_cfg, jobs)
+        except Exception as e:                        # one bad file never kills the batch
+            bad.append(incsv)
+            print(f"  !! {incsv}: {type(e).__name__}: {e}")
+            continue
+        print(f"done: {n_ok} rows -> {outcsv}  ({n_err} errors)")
+    if len(pairs) > 1:
+        print(f"all done: {len(pairs) - len(bad)}/{len(pairs)} files"
+              + (f"  (failed: {', '.join(bad)})" if bad else ""))
 
 
 if __name__ == "__main__":

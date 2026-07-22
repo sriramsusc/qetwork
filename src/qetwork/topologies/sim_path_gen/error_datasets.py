@@ -23,7 +23,7 @@ from pathlib import Path
 from qetwork.seed import make_rng
 from qetwork.topologies.topology_spec import TopologySpec
 
-N_DATASETS = 32
+N_DATASETS = 30
 
 # (lo, hi, scale); "log" = log-uniform for decade-spanning quantities
 RANGES = {

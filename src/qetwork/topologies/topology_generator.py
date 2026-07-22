@@ -108,9 +108,12 @@ def _merge(base: dict, override: dict | None) -> dict:
 
 def generate(kind: str, *, seed: int, out_path: str | None = None,
              qlink_length_range: tuple[float, float] = (1_000.0, 20_000.0),
+             roles: tuple[str, str] | None = None,
              node_overrides: dict | None = None, edge_overrides: dict | None = None,
              network: dict | None = None, name: str = "", **kind_kwargs) -> dict:
-    """Build a graph, resolve all randomness, and return (optionally write) the full spec dict."""
+    """Build a graph, resolve all randomness, and return (optionally write) the full spec dict.
+
+    roles pins (source, destination) to the named nodes instead of drawing them."""
     gen = _GENERATORS.get(kind)
     if gen is None:
         raise ValueError(f"unknown generator kind {kind!r}, expected one of {sorted(_GENERATORS)}")
@@ -128,10 +131,21 @@ def generate(kind: str, *, seed: int, out_path: str | None = None,
     unknown_edges = sorted(set(edge_overrides or {}) - edge_names)
     if unknown_edges:
         raise ValueError(f"edge_overrides name unknown edges {unknown_edges}")
+    if roles is not None:
+        src, dst = roles
+        unknown_roles = sorted({src, dst} - set(G.nodes))
+        if unknown_roles:
+            raise ValueError(f"roles name unknown nodes {unknown_roles}")
+        if src == dst:
+            raise ValueError(f"roles must be two distinct nodes, got {src!r} twice")
     rng = make_rng(seed)
 
     ids = list(G.nodes)
+    # drawn even when roles pins the pick: skipping it would shift the RNG stream
+    # and change every edge length drawn under the same seed
     i, j = (int(k) for k in rng.choice(len(ids), size=2, replace=False))
+    if roles is not None:
+        i, j = ids.index(roles[0]), ids.index(roles[1])
 
     nodes = {}
     for nid in ids:
@@ -156,7 +170,8 @@ def generate(kind: str, *, seed: int, out_path: str | None = None,
         "schema": "qetwork-topology/5",
         "name": name or f"{kind}-{'x'.join(str(v) for v in kind_kwargs.values())}-seed{seed}",
         "provenance": {"generator": kind, **kind_kwargs, "seed": seed,
-                       "qlink_length_range": [lo, hi]},
+                       "qlink_length_range": [lo, hi],
+                       **({"roles_override": list(roles)} if roles else {})},
         "network": _merge(DEFAULT_NETWORK, network),
         "roles": {"source": ids[i], "destination": ids[j]},
         "nodes": nodes,

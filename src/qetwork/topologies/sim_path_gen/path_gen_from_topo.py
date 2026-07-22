@@ -13,16 +13,23 @@ paths, and an edge forced onto a taken path steals it while the old owner
 re-solves (cycle-guarded); an edge with no distinct path left gets None.
 
 generate_paths: nx.shortest_simple_paths (Yen) yields simple S-T paths in
-nondecreasing hop order; the first max_paths are kept.
+nondecreasing hop order; the first max_paths are kept. No longer used by
+generate_datasets (Yen cannot reach long hop counts without exhausting the
+combinatorially many shorter paths first); kept as a standalone generator.
 
-generate_datasets: runs both on one topology and writes, under
-<name>_raw_paths/ in out_dir:
+sample_paths_by_length: up to per_length distinct simple S-T paths per hop
+count, sampled by seeded self-avoiding walks pruned by distance-to-target
+(plus parity on bipartite graphs), so every hop count is reachable directly.
+
+generate_datasets: runs max_flow_paths and sample_paths_by_length on one
+topology and writes, under <name>_raw_paths/ in out_dir:
     <name>_prior.csv    every assigned max-flow path
-    <name>_train.csv    9/10 of the enumerated paths (seeded random split)
-    <name>_test.csv     the remaining 1/10
+    <name>_train.csv    the sampled paths minus the test picks
+    <name>_test.csv     1 in TEST_SHARE of every hop-count bucket (seeded)
+The per-bucket split keeps train and test on the same hop-count distribution;
+the sampled hop range comes from HOP_RANGE[<generator kind>] unless overridden.
 All CSVs are PathID,PathString rows: 1,n94->n84->...->n63"""
 
-from collections import Counter
 from itertools import islice
 from pathlib import Path
 
@@ -35,8 +42,11 @@ from qetwork.topologies.topology_spec import TopologySpec
 _SRC, _SINK = "S_prime", "T_prime"
 _BIG = 10**6          # penalty per use of an already-assigned path's edge
 _RETRIES = 4          # penalized re-solves before declaring an edge forced
-MAX_PATHS = 7_000
-TEST_SHARE = 10       # one path in TEST_SHARE goes to the test set
+MAX_PATHS = 220
+TEST_SHARE = 9        # one path in TEST_SHARE of every hop-count bucket goes to the test set
+HOP_RANGE = {"grid": (11, 19)}   # per generator kind: sampled hop counts, inclusive
+PER_LENGTH = 44       # paths wanted per hop count; grid: 5 odd counts * (40 train + 4 test) = 220
+_DRY_STREAK = 5000    # sampler attempts without a new distinct path before a bucket closes
 
 
 def _as_spec(topology) -> TopologySpec:
@@ -172,6 +182,64 @@ def generate_paths(topology, max_paths: int = MAX_PATHS) -> list[list[str]]:
     return [list(p) for p in islice(gen, max_paths)]
 
 
+def sample_paths_by_length(topology, *, min_hops: int, max_hops: int,
+                           per_length: int = PER_LENGTH,
+                           seed: int | None = None) -> dict[int, list[list[str]]]:
+    """Up to per_length distinct simple S-T paths per hop count in
+    [min_hops, max_hops], sampled by seeded self-avoiding walks.
+
+    A walk of target length L only steps to nodes it can still finish from:
+    unvisited w with dist(w, T) within the remaining budget, parity-compatible
+    (bipartite graphs only, where every S-T path length has the same parity),
+    and T itself only on the last hop — so a completed walk has exactly L hops.
+    Walled-in walks restart; a bucket closes after _DRY_STREAK consecutive
+    attempts without a new distinct path, so scarce hop counts come up short
+    instead of spinning. Provably empty hop counts (below the S-T distance, or
+    parity-infeasible) are skipped and absent from the returned dict."""
+    spec = _as_spec(topology)
+    if not 1 <= min_hops <= max_hops:
+        raise ValueError(f"need 1 <= min_hops <= max_hops, got {min_hops}..{max_hops}")
+    if per_length < 1:
+        raise ValueError(f"per_length must be positive, got {per_length}")
+    s, t = spec.roles["source"], spec.roles["destination"]
+    G = spec.graph()
+    dist = nx.single_source_shortest_path_length(G, t)
+    if s not in dist:
+        raise ValueError(f"no path from {s} to {t} in the topology")
+    if dist[s] > max_hops:
+        raise ValueError(f"shortest {s}->{t} path is {dist[s]} hops, above max_hops={max_hops}")
+    fixed_parity = nx.is_bipartite(G)
+    rng = make_rng(seed)
+
+    buckets: dict[int, list[list[str]]] = {}
+    for L in range(min_hops, max_hops + 1):
+        if L < dist[s] or (fixed_parity and (L - dist[s]) % 2):
+            continue
+        found: dict[tuple[str, ...], None] = {}      # insertion-ordered dedup
+        dry = 0
+        while len(found) < per_length and dry < _DRY_STREAK:
+            path, visited, budget = [s], {s}, L
+            while budget:
+                opts = [w for w in G[path[-1]]
+                        if w not in visited and dist[w] <= budget - 1
+                        and not (fixed_parity and (budget - 1 - dist[w]) % 2)
+                        and (w != t or budget == 1)]
+                if not opts:
+                    break
+                w = opts[int(rng.integers(len(opts)))]
+                path.append(w)
+                visited.add(w)
+                budget -= 1
+            key = tuple(path)
+            if path[-1] == t and key not in found:
+                found[key] = None
+                dry = 0
+            else:
+                dry += 1
+        buckets[L] = [list(p) for p in found]
+    return buckets
+
+
 def write_paths_csv(paths: list[list[str]], out_path) -> None:
     """PathID,PathString rows, IDs numbered 1..len(paths) in list order."""
     with open(out_path, "w") as f:
@@ -194,15 +262,31 @@ def _validate(paths: list[list[str]], spec: TopologySpec, label: str) -> None:
         raise RuntimeError(f"{label}: duplicate paths")
 
 
-def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
+def generate_datasets(topology, *, per_length: int = PER_LENGTH,
+                      hop_range: tuple[int, int] | None = None,
                       seed: int | None = None, out_dir=None) -> dict[str, Path]:
     """Write <name>_raw_paths/<name>_{prior,train,test}.csv under out_dir;
     return the CSV paths.
 
-    out_dir defaults to the topology file's directory (cwd if a TopologySpec
-    object was passed instead of a file); the <name>_raw_paths subdirectory
-    is created if missing."""
+    train/test are per_length sampled paths per hop count in hop_range
+    (default: HOP_RANGE[<generator kind>] from the spec's provenance), split
+    1 in TEST_SHARE within every hop-count bucket so both sets keep the same
+    hop-count distribution; buckets that cannot fill their quota contribute
+    what exists, and the shortfall is reported. out_dir defaults to the
+    topology file's directory (cwd if a TopologySpec object was passed
+    instead of a file); the <name>_raw_paths subdirectory is created if
+    missing."""
     spec = _as_spec(topology)
+    if hop_range is None:
+        kind = spec.provenance.get("generator")
+        hop_range = HOP_RANGE.get(kind)
+        if hop_range is None:
+            raise ValueError(f"no hop range configured for generator {kind!r}; "
+                             f"add it to HOP_RANGE or pass hop_range=")
+    lo_h, hi_h = hop_range
+    if per_length < TEST_SHARE:
+        raise ValueError(f"per_length={per_length} cannot fund a stratified test "
+                         f"split; need at least TEST_SHARE={TEST_SHARE} per bucket")
     if out_dir is None:
         out_dir = Path.cwd() if isinstance(topology, TopologySpec) \
             else Path(topology).resolve().parent
@@ -217,15 +301,22 @@ def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
     missing = sorted(e for e, p in per_edge.items() if p is None)
     _validate(prior, spec, "prior")
 
-    enum = generate_paths(spec, max_paths)
-    _validate(enum, spec, "enumerated")
-    if len(enum) < 2:
-        raise ValueError(f"only {len(enum)} path(s) enumerated; cannot split")
-    n_test = max(1, len(enum) // TEST_SHARE)
-    picked = make_rng(seed).choice(len(enum), size=n_test, replace=False)
-    test_idx = set(int(i) for i in picked)
-    train = [p for i, p in enumerate(enum) if i not in test_idx]
-    test = [p for i, p in enumerate(enum) if i in test_idx]
+    buckets = sample_paths_by_length(spec, min_hops=lo_h, max_hops=hi_h,
+                                     per_length=per_length, seed=seed)
+    sampled = [p for L in sorted(buckets) for p in buckets[L]]
+    _validate(sampled, spec, "sampled")
+    rng = make_rng(seed)
+    train, test = [], []
+    for L in sorted(buckets):
+        b = buckets[L]
+        n_test = len(b) // TEST_SHARE
+        picked = {int(i) for i in rng.choice(len(b), size=n_test, replace=False)} \
+            if n_test else set()
+        train += [p for i, p in enumerate(b) if i not in picked]
+        test += [p for i, p in enumerate(b) if i in picked]
+    if not test:
+        raise ValueError(f"sampled only {len(sampled)} path(s) across hops "
+                         f"{lo_h}..{hi_h}; no bucket reached TEST_SHARE={TEST_SHARE}")
 
     outs = {"prior": raw_dir / f"{spec.name}_prior.csv",
             "train": raw_dir / f"{spec.name}_train.csv",
@@ -234,11 +325,17 @@ def generate_datasets(topology, *, max_paths: int = MAX_PATHS,
     write_paths_csv(train, outs["train"])
     write_paths_csv(test, outs["test"])
 
-    hist = Counter(len(p) - 1 for p in enum)
     print(f"{spec.name}: prior {len(prior)}/{len(per_edge)} edges"
           + (f" (no path for {missing})" if missing else ""))
-    print(f"enumerated {len(enum)} paths, hops {min(hist)}..{max(hist)}; "
-          f"split train {len(train)} / test {len(test)}")
+    print(f"sampled {len(sampled)} paths ({per_length} wanted per hop count "
+          f"{lo_h}..{hi_h}); split train {len(train)} / test {len(test)}")
+    infeasible = [L for L in range(lo_h, hi_h + 1) if L not in buckets]
+    if infeasible:
+        print(f"  no possible path at hop counts {infeasible}")
+    short = {L: len(b) for L, b in buckets.items() if len(b) < per_length}
+    if short:
+        print("  !! under quota: "
+              + ", ".join(f"{L} hops: {n}" for L, n in sorted(short.items())))
     for kind, p in outs.items():
         print(f"  {kind}: {p}")
     return outs
