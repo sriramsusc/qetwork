@@ -5,7 +5,11 @@ from dataclasses import dataclass
 import numpy as np
 
 @dataclass(slots=True)
+
 class State:
+
+    # CITE density-op | valid density operator: Hermitian, unit trace, positive semidefinite | Nielsen & Chuang (2010), §2.4 "The density operator"
+
     matrix: np.ndarray
     keys: tuple[int, ...]
 
