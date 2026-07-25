@@ -42,8 +42,8 @@ from qetwork.topologies.topology_spec import TopologySpec
 _SRC, _SINK = "S_prime", "T_prime"
 _BIG = 10**6          # penalty per use of an already-assigned path's edge
 _RETRIES = 4          # penalized re-solves before declaring an edge forced
-MAX_PATHS = 1200
-TEST_SHARE = 9        # one path in TEST_SHARE of every hop-count bucket goes to the test set
+MAX_PATHS = 1500
+TEST_SHARE = 5        # one path in TEST_SHARE of every hop-count bucket goes to the test set
 HOP_RANGE = {"grid": (11, 19)}   # per generator kind: sampled hop counts, inclusive
 PER_LENGTH = 44       # sample_paths_by_length default when called standalone
 _DRY_STREAK = 5000    # sampler attempts without a new distinct path before a bucket closes
