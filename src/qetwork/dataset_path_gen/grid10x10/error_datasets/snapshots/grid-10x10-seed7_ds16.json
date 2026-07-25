@@ -1,0 +1,5179 @@
+{
+  "schema": "qetwork-topology/5",
+  "name": "grid-10x10-seed7-ds16",
+  "provenance": {
+    "generator": "grid",
+    "rows": 10,
+    "cols": 10,
+    "seed": 7,
+    "qlink_length_range": [
+      10.0,
+      100.0
+    ],
+    "roles_override": [
+      "n1",
+      "n10"
+    ]
+  },
+  "network": {
+    "cfiber_latency": 0,
+    "cfiber_n": 1.468
+  },
+  "roles": {
+    "source": "n1",
+    "destination": "n10"
+  },
+  "nodes": {
+    "n1": {
+      "t1": 2102519431.7727766,
+      "t2": 276457975.4378347,
+      "gates": {
+        "p_depol_1q": 0.00021038441142246284,
+        "p_depol_2q": 0.0011544504546357472,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0416706004114287
+        },
+        "coherent_2q": {
+          "zz_angle": 0.010257108360717094
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9114325173197564,
+        "phase": 2.274664795854414,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {
+        "d1": {
+          "kind": "time-energy",
+          "coupling_1": 0.9274134269986544,
+          "coupling_2": 0.8971934482710707,
+          "mzi": {
+            "delta_t": 400,
+            "phase": 0.0,
+            "phase_error": 0.014788989914684846,
+            "loss_short": 0.07129208892642425,
+            "loss_long": 0.6776936271588566,
+            "band": [
+              1520,
+              1570
+            ],
+            "bs1": {
+              "reflectivity": 0.4796968211416724,
+              "loss": 0.20084474130515867,
+              "convention": "real",
+              "band": [
+                1520,
+                1570
+              ]
+            },
+            "bs2": {
+              "reflectivity": 0.47949148830766564,
+              "loss": 0.09443826355306274,
+              "convention": "real",
+              "band": [
+                1520,
+                1570
+              ]
+            }
+          },
+          "snspd_1": {
+            "efficiency": 0.8377666516544028,
+            "jitter_fwhm": 98.53452653707579,
+            "dark_count_rate": 1.1595277865035588e-13,
+            "dead_time": 21453,
+            "band": [
+              1400,
+              1700
+            ]
+          },
+          "snspd_2": {
+            "efficiency": 0.9505322325695125,
+            "jitter_fwhm": 22.434556065446902,
+            "dark_count_rate": 1.3267453303964172e-12,
+            "dead_time": 33651,
+            "band": [
+              1400,
+              1700
+            ]
+          }
+        },
+        "d2": {
+          "kind": "time-energy",
+          "coupling_1": 0.9393971164515763,
+          "coupling_2": 0.8822402356079648,
+          "mzi": {
+            "delta_t": 400,
+            "phase": 0.0,
+            "phase_error": 0.1260881733946484,
+            "loss_short": 0.747427195739074,
+            "loss_long": 0.5311013312078162,
+            "band": [
+              1520,
+              1570
+            ],
+            "bs1": {
+              "reflectivity": 0.47490617756190745,
+              "loss": 0.23772564286080944,
+              "convention": "real",
+              "band": [
+                1520,
+                1570
+              ]
+            },
+            "bs2": {
+              "reflectivity": 0.5365990554094507,
+              "loss": 0.2508847533325815,
+              "convention": "real",
+              "band": [
+                1520,
+                1570
+              ]
+            }
+          },
+          "snspd_1": {
+            "efficiency": 0.8093084781700705,
+            "jitter_fwhm": 72.81628145698957,
+            "dark_count_rate": 6.542662908527506e-11,
+            "dead_time": 94877,
+            "band": [
+              1400,
+              1700
+            ]
+          },
+          "snspd_2": {
+            "efficiency": 0.847426106011226,
+            "jitter_fwhm": 80.7712146558933,
+            "dark_count_rate": 5.706712591815665e-11,
+            "dead_time": 89085,
+            "band": [
+              1400,
+              1700
+            ]
+          }
+        }
+      },
+      "coord": [
+        0,
+        0
+      ]
+    },
+    "n2": {
+      "t1": 2927791540235.1533,
+      "t2": 2084465388612.5315,
+      "gates": {
+        "p_depol_1q": 5.2378215009352566e-05,
+        "p_depol_2q": 0.00020665639136372685,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.018167601732296212
+        },
+        "coherent_2q": {
+          "zz_angle": 0.040752584442262235
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9125067478794692,
+        "phase": 4.00832777733288,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        1
+      ]
+    },
+    "n3": {
+      "t1": 86652336174147.9,
+      "t2": 68044832871271.09,
+      "gates": {
+        "p_depol_1q": 0.00021997162174121582,
+        "p_depol_2q": 0.003848226745545591,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.005823822703281085
+        },
+        "coherent_2q": {
+          "zz_angle": 0.024941688125678492
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9505316802109341,
+        "phase": 4.917822496873366,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        2
+      ]
+    },
+    "n4": {
+      "t1": 25880146389.110302,
+      "t2": 3307135696.4811406,
+      "gates": {
+        "p_depol_1q": 0.0002490162479885902,
+        "p_depol_2q": 0.0009664697361059363,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04211470298593582
+        },
+        "coherent_2q": {
+          "zz_angle": 0.024074484676934245
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9803957240228912,
+        "phase": 3.1908214218970086,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        3
+      ]
+    },
+    "n5": {
+      "t1": 8193935652997.363,
+      "t2": 4307623405467.1714,
+      "gates": {
+        "p_depol_1q": 3.405376077033734e-05,
+        "p_depol_2q": 0.0004157159141382429,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04495977612596147
+        },
+        "coherent_2q": {
+          "zz_angle": 0.011550356381500216
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9662625528447895,
+        "phase": 0.9118166811414269,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        4
+      ]
+    },
+    "n6": {
+      "t1": 5967492148134.886,
+      "t2": 997887783398.5562,
+      "gates": {
+        "p_depol_1q": 0.0001542164655820482,
+        "p_depol_2q": 0.0013442714512594393,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.010175712651675812
+        },
+        "coherent_2q": {
+          "zz_angle": 0.024570166056284495
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9835285624170774,
+        "phase": 4.275892001413314,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        5
+      ]
+    },
+    "n7": {
+      "t1": 91890792169514.64,
+      "t2": 55953371009833.836,
+      "gates": {
+        "p_depol_1q": 0.00019360245877738958,
+        "p_depol_2q": 0.001337839850764904,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.046871432301436415
+        },
+        "coherent_2q": {
+          "zz_angle": 0.026350671867626452
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9382539132104029,
+        "phase": 5.243277796827653,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        6
+      ]
+    },
+    "n8": {
+      "t1": 50259954906078.266,
+      "t2": 15140457083062.729,
+      "gates": {
+        "p_depol_1q": 1.8813822711886306e-05,
+        "p_depol_2q": 0.0016471973557037735,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.037044113096453245
+        },
+        "coherent_2q": {
+          "zz_angle": 0.018681804159172016
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.97104849146864,
+        "phase": 3.3366939934480357,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        7
+      ]
+    },
+    "n9": {
+      "t1": 32120378335.397808,
+      "t2": 13686798719.532948,
+      "gates": {
+        "p_depol_1q": 5.9964626235665914e-05,
+        "p_depol_2q": 0.0037467180098334093,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0001540013958429287
+        },
+        "coherent_2q": {
+          "zz_angle": 0.040908905797665575
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9291246513654222,
+        "phase": 6.029511524036653,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        8
+      ]
+    },
+    "n10": {
+      "t1": 6249198762943.111,
+      "t2": 1088590707860.9745,
+      "gates": {
+        "p_depol_1q": 0.0009069812676860336,
+        "p_depol_2q": 0.0009980704188075915,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.026146189863229887
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04547590670469327
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9872482914107696,
+        "phase": 4.378641911324464,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        0,
+        9
+      ]
+    },
+    "n11": {
+      "t1": 78027590813844.34,
+      "t2": 16638666133195.316,
+      "gates": {
+        "p_depol_1q": 2.9152323108524346e-05,
+        "p_depol_2q": 0.0001144230297096391,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.017317246923889373
+        },
+        "coherent_2q": {
+          "zz_angle": 0.030131667165604243
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.92901100974208,
+        "phase": 3.6418614833560303,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        0
+      ]
+    },
+    "n12": {
+      "t1": 1745535801.7349663,
+      "t2": 394475309.39171207,
+      "gates": {
+        "p_depol_1q": 0.00031333565222660127,
+        "p_depol_2q": 0.0001616790394687502,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.035741872782775776
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03816555565047445
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.954032343366103,
+        "phase": 5.567452294330228,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        1
+      ]
+    },
+    "n13": {
+      "t1": 59267630020990.47,
+      "t2": 6419408960071.447,
+      "gates": {
+        "p_depol_1q": 0.00022812141046256326,
+        "p_depol_2q": 0.00029809109677182786,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.02040916545024138
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03115771412548496
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9676658656809203,
+        "phase": 5.279075304975943,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        2
+      ]
+    },
+    "n14": {
+      "t1": 3364608915794.6646,
+      "t2": 2015271602758.4985,
+      "gates": {
+        "p_depol_1q": 0.00015781286298470509,
+        "p_depol_2q": 0.00017144237226198307,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0010715157442646674
+        },
+        "coherent_2q": {
+          "zz_angle": 0.026489152446076466
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.967976399555421,
+        "phase": 0.6840226657521925,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        3
+      ]
+    },
+    "n15": {
+      "t1": 140113421797.3539,
+      "t2": 25273019714.016285,
+      "gates": {
+        "p_depol_1q": 0.00013620282024771202,
+        "p_depol_2q": 0.000603956284703367,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01007337502170732
+        },
+        "coherent_2q": {
+          "zz_angle": 0.00021963568697223046
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9305448840611884,
+        "phase": 3.243142416181713,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        4
+      ]
+    },
+    "n16": {
+      "t1": 44263465710815.39,
+      "t2": 7473455104303.263,
+      "gates": {
+        "p_depol_1q": 0.00010580595998416587,
+        "p_depol_2q": 0.0013582917689802688,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0324613828429493
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0164283175437226
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9094507728515479,
+        "phase": 5.78905199099129,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        5
+      ]
+    },
+    "n17": {
+      "t1": 58046647802819.85,
+      "t2": 15922390926643.611,
+      "gates": {
+        "p_depol_1q": 0.0001449272073873857,
+        "p_depol_2q": 0.00011430172549999782,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0023607820557587423
+        },
+        "coherent_2q": {
+          "zz_angle": 0.003833370791329094
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9701808999106475,
+        "phase": 1.4277564156970333,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        6
+      ]
+    },
+    "n18": {
+      "t1": 8360574378.717966,
+      "t2": 852258708.5444407,
+      "gates": {
+        "p_depol_1q": 1.1112073070119543e-05,
+        "p_depol_2q": 0.0006467962669542711,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.027083896533859588
+        },
+        "coherent_2q": {
+          "zz_angle": 0.028952959088395982
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.943501562212187,
+        "phase": 2.887508632876641,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        7
+      ]
+    },
+    "n19": {
+      "t1": 5830568826747.906,
+      "t2": 1135745594625.5544,
+      "gates": {
+        "p_depol_1q": 2.9883787258157097e-05,
+        "p_depol_2q": 0.005112677230592503,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.034463190385804254
+        },
+        "coherent_2q": {
+          "zz_angle": 0.023843322454143525
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9261634584257307,
+        "phase": 0.8581688820042288,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        8
+      ]
+    },
+    "n20": {
+      "t1": 1538530052.1409428,
+      "t2": 1095144286.51388,
+      "gates": {
+        "p_depol_1q": 0.0001537343807373504,
+        "p_depol_2q": 0.00012349773309393002,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.00792936989473772
+        },
+        "coherent_2q": {
+          "zz_angle": 0.013978213407661207
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9249918008328123,
+        "phase": 3.445642206064756,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        1,
+        9
+      ]
+    },
+    "n21": {
+      "t1": 99361494685.99403,
+      "t2": 75759084908.18356,
+      "gates": {
+        "p_depol_1q": 0.00027467643444642687,
+        "p_depol_2q": 0.006629261315967288,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04314093125797261
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04606845667467278
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9931010877774327,
+        "phase": 1.958446479915427,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        0
+      ]
+    },
+    "n22": {
+      "t1": 11179001624.632435,
+      "t2": 1635141652.0466418,
+      "gates": {
+        "p_depol_1q": 0.00018037524335376718,
+        "p_depol_2q": 0.002301088894053617,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.004391874710532329
+        },
+        "coherent_2q": {
+          "zz_angle": 0.041053579836631715
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9743913204870943,
+        "phase": 3.948818183063977,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        1
+      ]
+    },
+    "n23": {
+      "t1": 150682354381.47827,
+      "t2": 21464446096.782673,
+      "gates": {
+        "p_depol_1q": 0.00010260878423071602,
+        "p_depol_2q": 0.00020813187231890774,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.030248939254446678
+        },
+        "coherent_2q": {
+          "zz_angle": 0.015498236516153459
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9234940949188607,
+        "phase": 2.771207550244346,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        2
+      ]
+    },
+    "n24": {
+      "t1": 800873643297.2477,
+      "t2": 186650031202.87244,
+      "gates": {
+        "p_depol_1q": 0.0008456814457524265,
+        "p_depol_2q": 0.00010275318013515207,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.045643050922383875
+        },
+        "coherent_2q": {
+          "zz_angle": 3.42024741318725e-05
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9205876341730252,
+        "phase": 6.2602593767965695,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        3
+      ]
+    },
+    "n25": {
+      "t1": 4369954132246.869,
+      "t2": 1927415069893.73,
+      "gates": {
+        "p_depol_1q": 0.00028326033322195586,
+        "p_depol_2q": 0.0006555297015736067,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03921048656631463
+        },
+        "coherent_2q": {
+          "zz_angle": 0.007743401645913978
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9754197768025819,
+        "phase": 5.903220230920608,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        4
+      ]
+    },
+    "n26": {
+      "t1": 19428275465764.25,
+      "t2": 10668299655711.135,
+      "gates": {
+        "p_depol_1q": 0.00020079580082950092,
+        "p_depol_2q": 0.0011020069428052082,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.019761163976809406
+        },
+        "coherent_2q": {
+          "zz_angle": 0.043282679542991975
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9615085645915673,
+        "phase": 2.732559262476625,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        5
+      ]
+    },
+    "n27": {
+      "t1": 8393799488898.358,
+      "t2": 950741266353.4805,
+      "gates": {
+        "p_depol_1q": 0.0004229007952917136,
+        "p_depol_2q": 0.004182195645386673,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.011426470666116012
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0018835794955948282
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9678022557753306,
+        "phase": 1.2558304790716497,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        6
+      ]
+    },
+    "n28": {
+      "t1": 95523219979157.08,
+      "t2": 9756440466620.62,
+      "gates": {
+        "p_depol_1q": 2.8812700341620256e-05,
+        "p_depol_2q": 0.00012137375679223334,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.039132786772510975
+        },
+        "coherent_2q": {
+          "zz_angle": 0.028934774608694664
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9806012807818618,
+        "phase": 6.048278187106754,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        7
+      ]
+    },
+    "n29": {
+      "t1": 1123503169338.8325,
+      "t2": 191570135091.6997,
+      "gates": {
+        "p_depol_1q": 1.5321415192010016e-05,
+        "p_depol_2q": 0.005401595887487962,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.012255662750929864
+        },
+        "coherent_2q": {
+          "zz_angle": 0.044675911234903866
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9834373219633561,
+        "phase": 3.944641618248489,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        8
+      ]
+    },
+    "n30": {
+      "t1": 1047078164152.8962,
+      "t2": 934986997612.7646,
+      "gates": {
+        "p_depol_1q": 0.0003251099067870195,
+        "p_depol_2q": 0.0023257527458037932,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.02178703760092391
+        },
+        "coherent_2q": {
+          "zz_angle": 0.024199922286844186
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9369475043415085,
+        "phase": 5.9459103310007055,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        2,
+        9
+      ]
+    },
+    "n31": {
+      "t1": 1550943817722.3699,
+      "t2": 935318778237.6086,
+      "gates": {
+        "p_depol_1q": 1.1868599366868539e-05,
+        "p_depol_2q": 0.005068186692963089,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.02088191487222903
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03685801874080817
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9038024049079737,
+        "phase": 5.61637085170422,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        0
+      ]
+    },
+    "n32": {
+      "t1": 1991718457272.2659,
+      "t2": 571121801515.1638,
+      "gates": {
+        "p_depol_1q": 4.046841528179303e-05,
+        "p_depol_2q": 0.00041884012921055975,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.015169906223819968
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0065512926372576115
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9440619061127623,
+        "phase": 2.8493387973016184,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        1
+      ]
+    },
+    "n33": {
+      "t1": 114731665075.30177,
+      "t2": 57913196179.65165,
+      "gates": {
+        "p_depol_1q": 6.912413749078883e-05,
+        "p_depol_2q": 0.0001506632854475361,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.042602981115684405
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0212550432573633
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9622521371571633,
+        "phase": 5.842711112989863,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        2
+      ]
+    },
+    "n34": {
+      "t1": 6871879166029.753,
+      "t2": 2376152913367.004,
+      "gates": {
+        "p_depol_1q": 0.0001230394877464933,
+        "p_depol_2q": 0.005001060105650239,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.041181614654540316
+        },
+        "coherent_2q": {
+          "zz_angle": 0.008932636606371192
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9595176027442515,
+        "phase": 5.439451905274793,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        3
+      ]
+    },
+    "n35": {
+      "t1": 10388124239454.023,
+      "t2": 1384373098428.092,
+      "gates": {
+        "p_depol_1q": 7.43679216815033e-05,
+        "p_depol_2q": 0.0010875925129537043,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.012890477727641837
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03397496927752074
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9452415167933262,
+        "phase": 1.869302346966286,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        4
+      ]
+    },
+    "n36": {
+      "t1": 48341778951.633606,
+      "t2": 34752894597.172134,
+      "gates": {
+        "p_depol_1q": 0.0005400072753396803,
+        "p_depol_2q": 0.004214551012155784,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04569344105914683
+        },
+        "coherent_2q": {
+          "zz_angle": 0.047615325434072944
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9467236515240913,
+        "phase": 0.6076067790984719,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        5
+      ]
+    },
+    "n37": {
+      "t1": 10008178361107.941,
+      "t2": 4303154754946.098,
+      "gates": {
+        "p_depol_1q": 5.768121243011542e-05,
+        "p_depol_2q": 0.008934418781974776,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.016934260135181824
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0453816989333051
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.956295522565571,
+        "phase": 0.23022837597150714,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        6
+      ]
+    },
+    "n38": {
+      "t1": 20029750539200.08,
+      "t2": 11584772661523.967,
+      "gates": {
+        "p_depol_1q": 0.00019274143703541327,
+        "p_depol_2q": 0.0016950178659835048,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01094177463279515
+        },
+        "coherent_2q": {
+          "zz_angle": 0.010724306459967237
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9027713806976954,
+        "phase": 0.9684742431448877,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        7
+      ]
+    },
+    "n39": {
+      "t1": 48128942734.58739,
+      "t2": 16715955942.571404,
+      "gates": {
+        "p_depol_1q": 1.8264892269830192e-05,
+        "p_depol_2q": 0.0013036000262753326,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.013166006060589763
+        },
+        "coherent_2q": {
+          "zz_angle": 0.012698056247118096
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.990054699703606,
+        "phase": 6.235084657505686,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        8
+      ]
+    },
+    "n40": {
+      "t1": 11407565813079.941,
+      "t2": 1292959625820.65,
+      "gates": {
+        "p_depol_1q": 0.00028659157625091173,
+        "p_depol_2q": 0.00022743194402138285,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.028461065686044524
+        },
+        "coherent_2q": {
+          "zz_angle": 0.044685681460454416
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9361185850156939,
+        "phase": 5.836084428310366,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        3,
+        9
+      ]
+    },
+    "n41": {
+      "t1": 3482259137836.656,
+      "t2": 696422670311.3348,
+      "gates": {
+        "p_depol_1q": 1.5482261471956274e-05,
+        "p_depol_2q": 0.0042727016612931065,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.02290297042464977
+        },
+        "coherent_2q": {
+          "zz_angle": 0.003634674407998373
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.90979662392783,
+        "phase": 6.075597547335748,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        0
+      ]
+    },
+    "n42": {
+      "t1": 16406266901.03254,
+      "t2": 15191510226.92216,
+      "gates": {
+        "p_depol_1q": 0.00023031337494396124,
+        "p_depol_2q": 0.0003990085516169772,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01918639371217394
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03885192220540007
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9413644229979126,
+        "phase": 0.46967298792049156,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        1
+      ]
+    },
+    "n43": {
+      "t1": 14095180698.589476,
+      "t2": 10219169928.713171,
+      "gates": {
+        "p_depol_1q": 0.0002468017722353536,
+        "p_depol_2q": 0.001004690330212473,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.012274783430780834
+        },
+        "coherent_2q": {
+          "zz_angle": 0.023729530754499847
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9749406604888639,
+        "phase": 0.5123510181841425,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        2
+      ]
+    },
+    "n44": {
+      "t1": 94154069059269.06,
+      "t2": 68171309674372.234,
+      "gates": {
+        "p_depol_1q": 4.324456826883718e-05,
+        "p_depol_2q": 0.005510023203909634,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.034085726495164816
+        },
+        "coherent_2q": {
+          "zz_angle": 0.033317721354966454
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9132724280497019,
+        "phase": 5.691903896331259,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        3
+      ]
+    },
+    "n45": {
+      "t1": 178529087248.3699,
+      "t2": 113484550799.7227,
+      "gates": {
+        "p_depol_1q": 3.972350676247792e-05,
+        "p_depol_2q": 0.00041305447458961884,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04823445899909561
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02483299623317165
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9056896177713852,
+        "phase": 5.250899725744094,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        4
+      ]
+    },
+    "n46": {
+      "t1": 13682016560.391592,
+      "t2": 10349130529.309937,
+      "gates": {
+        "p_depol_1q": 0.0006805808987001276,
+        "p_depol_2q": 0.0001398080011095071,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.029121461378719245
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04907620527884232
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9884373633913572,
+        "phase": 3.300200897651627,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        5
+      ]
+    },
+    "n47": {
+      "t1": 2526189794713.894,
+      "t2": 1015612439296.4066,
+      "gates": {
+        "p_depol_1q": 2.549803379975073e-05,
+        "p_depol_2q": 0.002022996582204316,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01665705917504066
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01689859645979125
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9398988752893496,
+        "phase": 5.354385272505649,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        6
+      ]
+    },
+    "n48": {
+      "t1": 15549954722.48369,
+      "t2": 2770261685.9099627,
+      "gates": {
+        "p_depol_1q": 1.0343793151373905e-05,
+        "p_depol_2q": 0.00020418025310496666,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04893396437024683
+        },
+        "coherent_2q": {
+          "zz_angle": 0.021693497275323794
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.918540645769847,
+        "phase": 6.067557764758599,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        7
+      ]
+    },
+    "n49": {
+      "t1": 1366436140.9737022,
+      "t2": 416634977.140245,
+      "gates": {
+        "p_depol_1q": 0.0004066345455423075,
+        "p_depol_2q": 0.0035127756142532386,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.009460863274790971
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03538948366888824
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9591174178213557,
+        "phase": 4.242885599596899,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        8
+      ]
+    },
+    "n50": {
+      "t1": 21405435994.213383,
+      "t2": 13843900402.251331,
+      "gates": {
+        "p_depol_1q": 0.00013136359301373627,
+        "p_depol_2q": 0.0028193961022873358,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04697867549431822
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04277486364452643
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9743220597000594,
+        "phase": 1.8199167666694516,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        4,
+        9
+      ]
+    },
+    "n51": {
+      "t1": 1863869764.415209,
+      "t2": 699938731.7809647,
+      "gates": {
+        "p_depol_1q": 1.1722658310217171e-05,
+        "p_depol_2q": 0.002681510787521075,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03684108356481354
+        },
+        "coherent_2q": {
+          "zz_angle": 0.028145563061933027
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9159744316914276,
+        "phase": 5.502320050862252,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        0
+      ]
+    },
+    "n52": {
+      "t1": 954126943502.6406,
+      "t2": 312246881827.02966,
+      "gates": {
+        "p_depol_1q": 0.00013651598880250475,
+        "p_depol_2q": 0.0001464785976979187,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.037021852736946324
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0030387791944522014
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9549468750590113,
+        "phase": 1.063473642617095,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        1
+      ]
+    },
+    "n53": {
+      "t1": 10927220199.41396,
+      "t2": 1869665634.5257506,
+      "gates": {
+        "p_depol_1q": 1.0680984306899526e-05,
+        "p_depol_2q": 0.006076838047701027,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04021176357449287
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0015643223833216092
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9054136783599493,
+        "phase": 4.918960305396641,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        2
+      ]
+    },
+    "n54": {
+      "t1": 1081474883.8555002,
+      "t2": 318431007.95748925,
+      "gates": {
+        "p_depol_1q": 1.6390587047092006e-05,
+        "p_depol_2q": 0.001524981074687762,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04991702089422037
+        },
+        "coherent_2q": {
+          "zz_angle": 0.00860107577707408
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9908849654991425,
+        "phase": 5.437962070937512,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        3
+      ]
+    },
+    "n55": {
+      "t1": 84971804400644.19,
+      "t2": 49597921206256.664,
+      "gates": {
+        "p_depol_1q": 0.0005175931295072923,
+        "p_depol_2q": 0.001545949414581971,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.043364204058725625
+        },
+        "coherent_2q": {
+          "zz_angle": 0.00557561279397063
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9704571589150004,
+        "phase": 3.950386804122919,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        4
+      ]
+    },
+    "n56": {
+      "t1": 1991738937.4993267,
+      "t2": 389782902.3219925,
+      "gates": {
+        "p_depol_1q": 2.7052885895713603e-05,
+        "p_depol_2q": 0.0006461761160563416,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.00991766707618657
+        },
+        "coherent_2q": {
+          "zz_angle": 0.013741482207599255
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9281228628480704,
+        "phase": 3.7687230033326853,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        5
+      ]
+    },
+    "n57": {
+      "t1": 4724640847.132224,
+      "t2": 823133041.4205934,
+      "gates": {
+        "p_depol_1q": 4.308202634454862e-05,
+        "p_depol_2q": 0.0007909260442080883,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0019044316414991548
+        },
+        "coherent_2q": {
+          "zz_angle": 0.049960572603638065
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9285372402424424,
+        "phase": 1.8054410070675655,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        6
+      ]
+    },
+    "n58": {
+      "t1": 594775311281.969,
+      "t2": 424996263949.5895,
+      "gates": {
+        "p_depol_1q": 8.196316798709375e-05,
+        "p_depol_2q": 0.0003145418245693638,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.028293775159767717
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02414712750128649
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9401921085671181,
+        "phase": 6.181918900351928,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        7
+      ]
+    },
+    "n59": {
+      "t1": 95444591239430.23,
+      "t2": 34809288851179.254,
+      "gates": {
+        "p_depol_1q": 1.3677535609683146e-05,
+        "p_depol_2q": 0.0013609280361544962,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.047623607419144266
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04628462653473427
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9204725806959757,
+        "phase": 1.1945559361012763,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        8
+      ]
+    },
+    "n60": {
+      "t1": 5771374749.886059,
+      "t2": 3811216539.147305,
+      "gates": {
+        "p_depol_1q": 9.552347520407223e-05,
+        "p_depol_2q": 0.00047434370485975954,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01624035844198502
+        },
+        "coherent_2q": {
+          "zz_angle": 0.013770662147719393
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9838488785408688,
+        "phase": 2.57409468275552,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        5,
+        9
+      ]
+    },
+    "n61": {
+      "t1": 16599258116.3191,
+      "t2": 8521057271.308922,
+      "gates": {
+        "p_depol_1q": 0.00018659891483630136,
+        "p_depol_2q": 0.002696069660297453,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04109780572649325
+        },
+        "coherent_2q": {
+          "zz_angle": 0.00506168572844597
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9001889304377638,
+        "phase": 0.31771706347164747,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        0
+      ]
+    },
+    "n62": {
+      "t1": 3419529035732.1226,
+      "t2": 2940782030595.717,
+      "gates": {
+        "p_depol_1q": 4.594209166894393e-05,
+        "p_depol_2q": 0.0036508024456457506,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03645922554343347
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04890307896429599
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9447253427415216,
+        "phase": 1.0434672279767279,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        1
+      ]
+    },
+    "n63": {
+      "t1": 6701268249402.972,
+      "t2": 4415459106816.043,
+      "gates": {
+        "p_depol_1q": 0.0002597766735899126,
+        "p_depol_2q": 0.005325536266694471,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.018559129165995225
+        },
+        "coherent_2q": {
+          "zz_angle": 0.034515750161177444
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9250656207204909,
+        "phase": 2.805066165504298,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        2
+      ]
+    },
+    "n64": {
+      "t1": 16310258559.499369,
+      "t2": 2328061873.171415,
+      "gates": {
+        "p_depol_1q": 1.1800665389024894e-05,
+        "p_depol_2q": 0.0022021582076728282,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.043763654413870826
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01572097171556342
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9407773614275341,
+        "phase": 0.02228613346005549,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        3
+      ]
+    },
+    "n65": {
+      "t1": 115950830240.94806,
+      "t2": 22161338009.254887,
+      "gates": {
+        "p_depol_1q": 0.0001407343333557551,
+        "p_depol_2q": 0.006561971891015631,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.025307628456075627
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03377663299514309
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9670208697815339,
+        "phase": 0.9577579509216563,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        4
+      ]
+    },
+    "n66": {
+      "t1": 54057136800.82814,
+      "t2": 7014530215.708591,
+      "gates": {
+        "p_depol_1q": 7.611902337972433e-05,
+        "p_depol_2q": 0.005950745313043855,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.024046717536870682
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02280764916094632
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9198857368505489,
+        "phase": 1.9491526562762038,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        5
+      ]
+    },
+    "n67": {
+      "t1": 48194542578572.95,
+      "t2": 9682626663682.875,
+      "gates": {
+        "p_depol_1q": 0.00029025063002389566,
+        "p_depol_2q": 0.00012141807127535641,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.006415698004724896
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01557389581524491
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9856349818292214,
+        "phase": 1.3778501039231583,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        6
+      ]
+    },
+    "n68": {
+      "t1": 4302521512088.4834,
+      "t2": 632772384403.8124,
+      "gates": {
+        "p_depol_1q": 0.0001681450521431872,
+        "p_depol_2q": 0.0014916140363731164,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03109739505698362
+        },
+        "coherent_2q": {
+          "zz_angle": 0.014313826083126525
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9153997847104954,
+        "phase": 5.56995423400199,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        7
+      ]
+    },
+    "n69": {
+      "t1": 703428058407.5396,
+      "t2": 114620647431.37787,
+      "gates": {
+        "p_depol_1q": 6.70900485864314e-05,
+        "p_depol_2q": 0.00013620184351015858,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.023768805830118714
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02119453880914844
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9126089925504725,
+        "phase": 2.7920737273360383,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        8
+      ]
+    },
+    "n70": {
+      "t1": 1576382837587.014,
+      "t2": 1337063836727.2542,
+      "gates": {
+        "p_depol_1q": 0.000254900324248971,
+        "p_depol_2q": 0.001011278031018717,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03850255589305712
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01399676406754228
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9635342518522645,
+        "phase": 0.031806532050667226,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        6,
+        9
+      ]
+    },
+    "n71": {
+      "t1": 2305449705.1441197,
+      "t2": 970557541.9026176,
+      "gates": {
+        "p_depol_1q": 2.427164149753757e-05,
+        "p_depol_2q": 0.002384839589197198,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03183766322519103
+        },
+        "coherent_2q": {
+          "zz_angle": 0.003183337470396236
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9372871833264936,
+        "phase": 3.8516064056710517,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        0
+      ]
+    },
+    "n72": {
+      "t1": 3693245334847.759,
+      "t2": 2418200565781.03,
+      "gates": {
+        "p_depol_1q": 4.580214352648195e-05,
+        "p_depol_2q": 0.0047144614026032846,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.017712721300282213
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0003493420600001518
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9579505604845163,
+        "phase": 1.5184485788694226,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        1
+      ]
+    },
+    "n73": {
+      "t1": 4187034216.5149646,
+      "t2": 759039400.451202,
+      "gates": {
+        "p_depol_1q": 0.0004527182437564141,
+        "p_depol_2q": 0.006729807108199003,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.048084831193512055
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01514151815001255
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9433132272779597,
+        "phase": 5.042420217792474,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        2
+      ]
+    },
+    "n74": {
+      "t1": 38860952623.61601,
+      "t2": 9433147577.665209,
+      "gates": {
+        "p_depol_1q": 2.98228386219753e-05,
+        "p_depol_2q": 0.0013955154169051902,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.032963334941265514
+        },
+        "coherent_2q": {
+          "zz_angle": 0.015921972754329824
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9023018990685986,
+        "phase": 4.623845160404852,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        3
+      ]
+    },
+    "n75": {
+      "t1": 1210560354337.395,
+      "t2": 200440386884.42987,
+      "gates": {
+        "p_depol_1q": 4.2588794797685524e-05,
+        "p_depol_2q": 0.008207807807713782,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0315101772504643
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02977388781956923
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9607706200590367,
+        "phase": 5.99695187753399,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        4
+      ]
+    },
+    "n76": {
+      "t1": 50037472849.659744,
+      "t2": 9554574334.193655,
+      "gates": {
+        "p_depol_1q": 5.668719406120708e-05,
+        "p_depol_2q": 0.003998510015274477,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.006047943719498794
+        },
+        "coherent_2q": {
+          "zz_angle": 0.010341234897634222
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9216833236854289,
+        "phase": 3.998477074127521,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        5
+      ]
+    },
+    "n77": {
+      "t1": 1614043083588.147,
+      "t2": 380015671186.7803,
+      "gates": {
+        "p_depol_1q": 3.567668920787793e-05,
+        "p_depol_2q": 0.0032307537912671753,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.001586328347491467
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03693688553740468
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9199760294652315,
+        "phase": 5.672315539873442,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        6
+      ]
+    },
+    "n78": {
+      "t1": 117075555908.01779,
+      "t2": 51376336407.885475,
+      "gates": {
+        "p_depol_1q": 1.745575426778305e-05,
+        "p_depol_2q": 0.00032193546122312076,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03503042971777801
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02751777251661034
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9731953511916329,
+        "phase": 3.5399613032153576,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        7
+      ]
+    },
+    "n79": {
+      "t1": 702515488501.4882,
+      "t2": 506891356130.987,
+      "gates": {
+        "p_depol_1q": 7.069355708854947e-05,
+        "p_depol_2q": 0.0061672199751975,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.018610762402249948
+        },
+        "coherent_2q": {
+          "zz_angle": 0.016429710338502376
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9740450212902789,
+        "phase": 0.07254816766615713,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        8
+      ]
+    },
+    "n80": {
+      "t1": 7260400853.980522,
+      "t2": 856497971.987118,
+      "gates": {
+        "p_depol_1q": 0.00010573291022320368,
+        "p_depol_2q": 0.0018036073757350178,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.000518797293125356
+        },
+        "coherent_2q": {
+          "zz_angle": 0.008073177427016893
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9287414290665921,
+        "phase": 1.8486785864936446,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        7,
+        9
+      ]
+    },
+    "n81": {
+      "t1": 3059592477.5271425,
+      "t2": 455523766.2271288,
+      "gates": {
+        "p_depol_1q": 0.0004944285289238786,
+        "p_depol_2q": 0.0025186178862607093,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.014804719133167332
+        },
+        "coherent_2q": {
+          "zz_angle": 0.013170373215804249
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9076189242045685,
+        "phase": 2.1922406594467323,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        0
+      ]
+    },
+    "n82": {
+      "t1": 97801963329.70584,
+      "t2": 78438490893.1864,
+      "gates": {
+        "p_depol_1q": 0.00030635955359543406,
+        "p_depol_2q": 0.0009084636373679917,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.006742863439503999
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03280808245041646
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9889211697132496,
+        "phase": 0.4903702674336105,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        1
+      ]
+    },
+    "n83": {
+      "t1": 17500031858285.064,
+      "t2": 2649435764539.8384,
+      "gates": {
+        "p_depol_1q": 0.0002526747639355378,
+        "p_depol_2q": 0.00023319115553047175,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.030000677744365198
+        },
+        "coherent_2q": {
+          "zz_angle": 0.011881229211461154
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.951461315904561,
+        "phase": 3.7709031054043276,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        2
+      ]
+    },
+    "n84": {
+      "t1": 1237660770459.8882,
+      "t2": 596211712368.9828,
+      "gates": {
+        "p_depol_1q": 1.3742291318362198e-05,
+        "p_depol_2q": 0.0025513780076338506,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.007729886211770676
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03385162265684633
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9117835733525538,
+        "phase": 3.0122514653845434,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        3
+      ]
+    },
+    "n85": {
+      "t1": 85870131883.36816,
+      "t2": 79650496360.5272,
+      "gates": {
+        "p_depol_1q": 0.00018264943431321322,
+        "p_depol_2q": 0.0001501107609468681,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03504432307189807
+        },
+        "coherent_2q": {
+          "zz_angle": 0.009706919963949163
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9271842844577689,
+        "phase": 2.3778277513261434,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        4
+      ]
+    },
+    "n86": {
+      "t1": 7605490033245.954,
+      "t2": 6686643053893.8,
+      "gates": {
+        "p_depol_1q": 0.0007057816353463862,
+        "p_depol_2q": 0.0002194660077557058,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0030206738697289904
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04142665096397559
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9273807349689932,
+        "phase": 3.6620044121809006,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        5
+      ]
+    },
+    "n87": {
+      "t1": 78187499845902.14,
+      "t2": 12010451437314.88,
+      "gates": {
+        "p_depol_1q": 5.619682553799302e-05,
+        "p_depol_2q": 0.005434979274316846,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.032499027353902074
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04687765033764463
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9600133349210892,
+        "phase": 1.9073863628950403,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        6
+      ]
+    },
+    "n88": {
+      "t1": 10605790097558.596,
+      "t2": 6092657747986.45,
+      "gates": {
+        "p_depol_1q": 0.0007366104609089295,
+        "p_depol_2q": 0.0008960533429712655,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.025141964356715486
+        },
+        "coherent_2q": {
+          "zz_angle": 0.01619115501808377
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9255320417781207,
+        "phase": 6.261368951424329,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        7
+      ]
+    },
+    "n89": {
+      "t1": 76962219051022.3,
+      "t2": 26056977875546.42,
+      "gates": {
+        "p_depol_1q": 0.0008131509331622079,
+        "p_depol_2q": 0.0005155976095898401,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04249971620373432
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03174340789226677
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9681212808432681,
+        "phase": 4.512602112455632,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        8
+      ]
+    },
+    "n90": {
+      "t1": 1510578329292.3845,
+      "t2": 1075155451579.3779,
+      "gates": {
+        "p_depol_1q": 6.0817211174022046e-05,
+        "p_depol_2q": 0.00499318781389516,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.00917075819602743
+        },
+        "coherent_2q": {
+          "zz_angle": 0.009997971010002844
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9681476059372403,
+        "phase": 4.7132051053825315,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        8,
+        9
+      ]
+    },
+    "n91": {
+      "t1": 32471726047688.61,
+      "t2": 6112069432568.262,
+      "gates": {
+        "p_depol_1q": 1.2946098433284416e-05,
+        "p_depol_2q": 0.0010350073903035272,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.043767023268839626
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04857329268234267
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9814934980444495,
+        "phase": 3.0784871657407873,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        0
+      ]
+    },
+    "n92": {
+      "t1": 20744892103422.613,
+      "t2": 3395330887097.164,
+      "gates": {
+        "p_depol_1q": 0.0006955675333617998,
+        "p_depol_2q": 0.0013604792491223017,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.01946817929010511
+        },
+        "coherent_2q": {
+          "zz_angle": 0.029082059108216086
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9744807799373836,
+        "phase": 1.5087279609413153,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        1
+      ]
+    },
+    "n93": {
+      "t1": 3231461706.7628813,
+      "t2": 1747910203.1795752,
+      "gates": {
+        "p_depol_1q": 0.0008034112941995692,
+        "p_depol_2q": 0.0018791272217423688,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.007129172704511234
+        },
+        "coherent_2q": {
+          "zz_angle": 0.032169268472852834
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.911080049137184,
+        "phase": 1.9071022685400232,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        2
+      ]
+    },
+    "n94": {
+      "t1": 1438760499.6245399,
+      "t2": 442069070.156389,
+      "gates": {
+        "p_depol_1q": 4.3924656207589794e-05,
+        "p_depol_2q": 0.00015669090167034396,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.015451365114132587
+        },
+        "coherent_2q": {
+          "zz_angle": 0.03237850597080815
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9274627477725448,
+        "phase": 0.8989486258703309,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        3
+      ]
+    },
+    "n95": {
+      "t1": 529647985905.8975,
+      "t2": 300064484605.036,
+      "gates": {
+        "p_depol_1q": 0.00045738583690286665,
+        "p_depol_2q": 0.0008794157233210474,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03555362104618601
+        },
+        "coherent_2q": {
+          "zz_angle": 0.0416663874222051
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9639244769043139,
+        "phase": 3.3129439453153657,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        4
+      ]
+    },
+    "n96": {
+      "t1": 1993869985.012355,
+      "t2": 388804435.11071706,
+      "gates": {
+        "p_depol_1q": 4.3614441435213266e-05,
+        "p_depol_2q": 0.0006166269499968155,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.04754463516521565
+        },
+        "coherent_2q": {
+          "zz_angle": 0.010443767117642146
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9514477165456929,
+        "phase": 6.228007044191492,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        5
+      ]
+    },
+    "n97": {
+      "t1": 1241574556111.8726,
+      "t2": 200855407096.45038,
+      "gates": {
+        "p_depol_1q": 0.0008324954404267314,
+        "p_depol_2q": 0.00047052785454477564,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.0023935354799315524
+        },
+        "coherent_2q": {
+          "zz_angle": 0.021568088372984018
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9228622911366295,
+        "phase": 5.145072827694311,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        6
+      ]
+    },
+    "n98": {
+      "t1": 12582854398.723621,
+      "t2": 8310615573.156333,
+      "gates": {
+        "p_depol_1q": 1.1812505754072993e-05,
+        "p_depol_2q": 0.00721630093380882,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.002109676339250677
+        },
+        "coherent_2q": {
+          "zz_angle": 0.046926992199349586
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9070006712039922,
+        "phase": 5.482604470880915,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        7
+      ]
+    },
+    "n99": {
+      "t1": 14343666804484.184,
+      "t2": 5637467171203.415,
+      "gates": {
+        "p_depol_1q": 1.1802449969373166e-05,
+        "p_depol_2q": 0.001746970669566974,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.030892321041343002
+        },
+        "coherent_2q": {
+          "zz_angle": 0.02785987374885848
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.9599949292874385,
+        "phase": 6.0827982118426105,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        8
+      ]
+    },
+    "n100": {
+      "t1": 94959023135244.38,
+      "t2": 31479805829930.08,
+      "gates": {
+        "p_depol_1q": 1.526164153277263e-05,
+        "p_depol_2q": 0.00018532674041107743,
+        "coherent_1q": {
+          "axis": "z",
+          "angle": 0.03601754396700076
+        },
+        "coherent_2q": {
+          "zz_angle": 0.04909817936115329
+        },
+        "durations": {
+          "gate_1q": 0,
+          "gate_2q": 0,
+          "measure": 0
+        }
+      },
+      "source": {
+        "signal_wavelength": 1530.0,
+        "idler_wavelength": 1570.0,
+        "visibility": 0.941425246254535,
+        "phase": 0.6159956078463847,
+        "encoding": "energy-time"
+      },
+      "memory": {
+        "emission_encoding": "energy-time",
+        "emission_wavelength": null
+      },
+      "detectors": {},
+      "coord": [
+        9,
+        9
+      ]
+    }
+  },
+  "edges": {
+    "e1": {
+      "u": "n1",
+      "v": "n2",
+      "length": 79.81171212206742,
+      "attenuation": 0.19177400972544537,
+      "insertion_loss_db": 0.44650924940847014,
+      "n": 1.468
+    },
+    "e2": {
+      "u": "n1",
+      "v": "n11",
+      "length": 30.268647099153267,
+      "attenuation": 0.24969358004967385,
+      "insertion_loss_db": 0.7179250179649486,
+      "n": 1.468
+    },
+    "e3": {
+      "u": "n2",
+      "v": "n3",
+      "length": 37.01496564201029,
+      "attenuation": 0.17060794774636717,
+      "insertion_loss_db": 0.4033690452481743,
+      "n": 1.468
+    },
+    "e4": {
+      "u": "n2",
+      "v": "n12",
+      "length": 88.61981008566357,
+      "attenuation": 0.16437028412490334,
+      "insertion_loss_db": 0.6877544573003044,
+      "n": 1.468
+    },
+    "e5": {
+      "u": "n3",
+      "v": "n4",
+      "length": 10.473877410901725,
+      "attenuation": 0.220546534198936,
+      "insertion_loss_db": 0.151747070566522,
+      "n": 1.468
+    },
+    "e6": {
+      "u": "n3",
+      "v": "n13",
+      "length": 83.91055765444897,
+      "attenuation": 0.19019679471688863,
+      "insertion_loss_db": 0.9125545302433112,
+      "n": 1.468
+    },
+    "e7": {
+      "u": "n4",
+      "v": "n5",
+      "length": 81.73624858768416,
+      "attenuation": 0.2344134427067324,
+      "insertion_loss_db": 0.6167913128300946,
+      "n": 1.468
+    },
+    "e8": {
+      "u": "n4",
+      "v": "n14",
+      "length": 52.11414575593487,
+      "attenuation": 0.20361610244271433,
+      "insertion_loss_db": 0.9935667208602935,
+      "n": 1.468
+    },
+    "e9": {
+      "u": "n5",
+      "v": "n6",
+      "length": 37.27291841373822,
+      "attenuation": 0.22499760035672145,
+      "insertion_loss_db": 0.957371690076231,
+      "n": 1.468
+    },
+    "e10": {
+      "u": "n5",
+      "v": "n15",
+      "length": 35.0583050890696,
+      "attenuation": 0.1664426692917865,
+      "insertion_loss_db": 0.2909360407226966,
+      "n": 1.468
+    },
+    "e11": {
+      "u": "n6",
+      "v": "n7",
+      "length": 32.938262888871215,
+      "attenuation": 0.1627999932170392,
+      "insertion_loss_db": 0.8811258532202578,
+      "n": 1.468
+    },
+    "e12": {
+      "u": "n6",
+      "v": "n16",
+      "length": 50.05686752943819,
+      "attenuation": 0.22248082970487976,
+      "insertion_loss_db": 0.25988648755792365,
+      "n": 1.468
+    },
+    "e13": {
+      "u": "n7",
+      "v": "n8",
+      "length": 55.409343306215796,
+      "attenuation": 0.24767715466979145,
+      "insertion_loss_db": 0.9602175003532335,
+      "n": 1.468
+    },
+    "e14": {
+      "u": "n7",
+      "v": "n17",
+      "length": 59.81476168670432,
+      "attenuation": 0.18021380244322363,
+      "insertion_loss_db": 0.6823087777384395,
+      "n": 1.468
+    },
+    "e15": {
+      "u": "n8",
+      "v": "n9",
+      "length": 99.59502550909534,
+      "attenuation": 0.2201292625062027,
+      "insertion_loss_db": 0.10361507951930404,
+      "n": 1.468
+    },
+    "e16": {
+      "u": "n8",
+      "v": "n18",
+      "length": 81.33957272923777,
+      "attenuation": 0.22199018130416495,
+      "insertion_loss_db": 0.2992061752948487,
+      "n": 1.468
+    },
+    "e17": {
+      "u": "n9",
+      "v": "n10",
+      "length": 65.99613064970464,
+      "attenuation": 0.24111868755416554,
+      "insertion_loss_db": 0.8546564193035642,
+      "n": 1.468
+    },
+    "e18": {
+      "u": "n9",
+      "v": "n19",
+      "length": 99.00641329136964,
+      "attenuation": 0.24147642262038613,
+      "insertion_loss_db": 0.7817985661099122,
+      "n": 1.468
+    },
+    "e19": {
+      "u": "n10",
+      "v": "n20",
+      "length": 29.377782841203906,
+      "attenuation": 0.17484148946928257,
+      "insertion_loss_db": 0.4244988816896642,
+      "n": 1.468
+    },
+    "e20": {
+      "u": "n11",
+      "v": "n12",
+      "length": 24.41908304720601,
+      "attenuation": 0.22380383262277775,
+      "insertion_loss_db": 0.39099253893239116,
+      "n": 1.468
+    },
+    "e21": {
+      "u": "n11",
+      "v": "n21",
+      "length": 65.12856438457277,
+      "attenuation": 0.22390296402550675,
+      "insertion_loss_db": 0.40254285247534405,
+      "n": 1.468
+    },
+    "e22": {
+      "u": "n12",
+      "v": "n13",
+      "length": 13.954780716524503,
+      "attenuation": 0.17599565089160876,
+      "insertion_loss_db": 0.5663474365505826,
+      "n": 1.468
+    },
+    "e23": {
+      "u": "n12",
+      "v": "n22",
+      "length": 13.211225089623653,
+      "attenuation": 0.22176049835532244,
+      "insertion_loss_db": 0.5654761185544828,
+      "n": 1.468
+    },
+    "e24": {
+      "u": "n13",
+      "v": "n14",
+      "length": 56.339993824423324,
+      "attenuation": 0.2177680568469361,
+      "insertion_loss_db": 0.4942459162938977,
+      "n": 1.468
+    },
+    "e25": {
+      "u": "n13",
+      "v": "n23",
+      "length": 51.95854227927602,
+      "attenuation": 0.23004981960850102,
+      "insertion_loss_db": 0.6849697803802368,
+      "n": 1.468
+    },
+    "e26": {
+      "u": "n14",
+      "v": "n15",
+      "length": 92.5450995873567,
+      "attenuation": 0.21171459706767853,
+      "insertion_loss_db": 0.49183454392800463,
+      "n": 1.468
+    },
+    "e27": {
+      "u": "n14",
+      "v": "n24",
+      "length": 66.63036290419095,
+      "attenuation": 0.208215480052416,
+      "insertion_loss_db": 0.1459087495223156,
+      "n": 1.468
+    },
+    "e28": {
+      "u": "n15",
+      "v": "n16",
+      "length": 56.27058819395625,
+      "attenuation": 0.22000477090151815,
+      "insertion_loss_db": 0.2839705563388791,
+      "n": 1.468
+    },
+    "e29": {
+      "u": "n15",
+      "v": "n25",
+      "length": 54.71860918541538,
+      "attenuation": 0.23741340643526576,
+      "insertion_loss_db": 0.831109391370975,
+      "n": 1.468
+    },
+    "e30": {
+      "u": "n16",
+      "v": "n17",
+      "length": 32.276342982459774,
+      "attenuation": 0.20751591995859875,
+      "insertion_loss_db": 0.8624179614811743,
+      "n": 1.468
+    },
+    "e31": {
+      "u": "n16",
+      "v": "n26",
+      "length": 11.061462298825527,
+      "attenuation": 0.22037229194343466,
+      "insertion_loss_db": 0.22713404040218196,
+      "n": 1.468
+    },
+    "e32": {
+      "u": "n17",
+      "v": "n18",
+      "length": 27.316192958677956,
+      "attenuation": 0.226669547916627,
+      "insertion_loss_db": 0.996225819104876,
+      "n": 1.468
+    },
+    "e33": {
+      "u": "n17",
+      "v": "n27",
+      "length": 72.28289087936552,
+      "attenuation": 0.16368795778819828,
+      "insertion_loss_db": 0.32042749119529046,
+      "n": 1.468
+    },
+    "e34": {
+      "u": "n18",
+      "v": "n19",
+      "length": 28.054605158829567,
+      "attenuation": 0.2137966673545208,
+      "insertion_loss_db": 0.4736750079927373,
+      "n": 1.468
+    },
+    "e35": {
+      "u": "n18",
+      "v": "n28",
+      "length": 43.2582679541986,
+      "attenuation": 0.21738005858919787,
+      "insertion_loss_db": 0.6277638998249071,
+      "n": 1.468
+    },
+    "e36": {
+      "u": "n19",
+      "v": "n20",
+      "length": 10.336081784686836,
+      "attenuation": 0.23091905211095584,
+      "insertion_loss_db": 0.16381262812667136,
+      "n": 1.468
+    },
+    "e37": {
+      "u": "n19",
+      "v": "n29",
+      "length": 84.7042956821571,
+      "attenuation": 0.19965544629356036,
+      "insertion_loss_db": 0.8740484107208204,
+      "n": 1.468
+    },
+    "e38": {
+      "u": "n20",
+      "v": "n30",
+      "length": 23.901497295529587,
+      "attenuation": 0.19264857148122655,
+      "insertion_loss_db": 0.5534099247432208,
+      "n": 1.468
+    },
+    "e39": {
+      "u": "n21",
+      "v": "n22",
+      "length": 34.08393741074069,
+      "attenuation": 0.161942076366427,
+      "insertion_loss_db": 0.3017565055758687,
+      "n": 1.468
+    },
+    "e40": {
+      "u": "n21",
+      "v": "n31",
+      "length": 89.22989385827458,
+      "attenuation": 0.2017289609424112,
+      "insertion_loss_db": 0.4590713136379093,
+      "n": 1.468
+    },
+    "e41": {
+      "u": "n22",
+      "v": "n23",
+      "length": 55.88117288815808,
+      "attenuation": 0.22431893892191285,
+      "insertion_loss_db": 0.65069198343239,
+      "n": 1.468
+    },
+    "e42": {
+      "u": "n22",
+      "v": "n32",
+      "length": 86.24352217292824,
+      "attenuation": 0.23922542699480487,
+      "insertion_loss_db": 0.869293631527661,
+      "n": 1.468
+    },
+    "e43": {
+      "u": "n23",
+      "v": "n24",
+      "length": 67.57454502482736,
+      "attenuation": 0.18170978566896787,
+      "insertion_loss_db": 0.11587485613048389,
+      "n": 1.468
+    },
+    "e44": {
+      "u": "n23",
+      "v": "n33",
+      "length": 76.75938526256714,
+      "attenuation": 0.23690236927333863,
+      "insertion_loss_db": 0.39620877769452967,
+      "n": 1.468
+    },
+    "e45": {
+      "u": "n24",
+      "v": "n25",
+      "length": 18.23460445567411,
+      "attenuation": 0.191239873831654,
+      "insertion_loss_db": 0.24255531837862673,
+      "n": 1.468
+    },
+    "e46": {
+      "u": "n24",
+      "v": "n34",
+      "length": 58.702943923883986,
+      "attenuation": 0.22237065395325095,
+      "insertion_loss_db": 0.35209802652471534,
+      "n": 1.468
+    },
+    "e47": {
+      "u": "n25",
+      "v": "n26",
+      "length": 55.69950126703149,
+      "attenuation": 0.17590687909560193,
+      "insertion_loss_db": 0.5530516669554204,
+      "n": 1.468
+    },
+    "e48": {
+      "u": "n25",
+      "v": "n35",
+      "length": 88.42054390235926,
+      "attenuation": 0.22753743153292982,
+      "insertion_loss_db": 0.34263873777247145,
+      "n": 1.468
+    },
+    "e49": {
+      "u": "n26",
+      "v": "n27",
+      "length": 42.513765311274184,
+      "attenuation": 0.22498351008899659,
+      "insertion_loss_db": 0.5157775987039642,
+      "n": 1.468
+    },
+    "e50": {
+      "u": "n26",
+      "v": "n36",
+      "length": 63.836566048649175,
+      "attenuation": 0.19633954509151919,
+      "insertion_loss_db": 0.42356878132255227,
+      "n": 1.468
+    },
+    "e51": {
+      "u": "n27",
+      "v": "n28",
+      "length": 15.332647811095326,
+      "attenuation": 0.1731022868787514,
+      "insertion_loss_db": 0.39937039016430476,
+      "n": 1.468
+    },
+    "e52": {
+      "u": "n27",
+      "v": "n37",
+      "length": 44.88686209996558,
+      "attenuation": 0.23913263775647337,
+      "insertion_loss_db": 0.19195023202485278,
+      "n": 1.468
+    },
+    "e53": {
+      "u": "n28",
+      "v": "n29",
+      "length": 39.0732711632386,
+      "attenuation": 0.24624700135916225,
+      "insertion_loss_db": 0.19674687473903613,
+      "n": 1.468
+    },
+    "e54": {
+      "u": "n28",
+      "v": "n38",
+      "length": 23.51797561634067,
+      "attenuation": 0.19258284780694185,
+      "insertion_loss_db": 0.6456755564204898,
+      "n": 1.468
+    },
+    "e55": {
+      "u": "n29",
+      "v": "n30",
+      "length": 83.47042934371682,
+      "attenuation": 0.2354057263247334,
+      "insertion_loss_db": 0.22922453626660358,
+      "n": 1.468
+    },
+    "e56": {
+      "u": "n29",
+      "v": "n39",
+      "length": 44.15015543952812,
+      "attenuation": 0.17269920016525886,
+      "insertion_loss_db": 0.6655403121955531,
+      "n": 1.468
+    },
+    "e57": {
+      "u": "n30",
+      "v": "n40",
+      "length": 98.08730959700995,
+      "attenuation": 0.18634719691643,
+      "insertion_loss_db": 0.6800518873161914,
+      "n": 1.468
+    },
+    "e58": {
+      "u": "n31",
+      "v": "n32",
+      "length": 63.09925237095492,
+      "attenuation": 0.2338524882636578,
+      "insertion_loss_db": 0.16918345988879055,
+      "n": 1.468
+    },
+    "e59": {
+      "u": "n31",
+      "v": "n41",
+      "length": 64.45506284468661,
+      "attenuation": 0.23600447107700046,
+      "insertion_loss_db": 0.13382682071899726,
+      "n": 1.468
+    },
+    "e60": {
+      "u": "n32",
+      "v": "n33",
+      "length": 67.4196922709499,
+      "attenuation": 0.24089435667599318,
+      "insertion_loss_db": 0.9780563274400285,
+      "n": 1.468
+    },
+    "e61": {
+      "u": "n32",
+      "v": "n42",
+      "length": 70.88052194315094,
+      "attenuation": 0.22007096822147043,
+      "insertion_loss_db": 0.9858297744497565,
+      "n": 1.468
+    },
+    "e62": {
+      "u": "n33",
+      "v": "n34",
+      "length": 23.570921725153184,
+      "attenuation": 0.23397926579157435,
+      "insertion_loss_db": 0.13992895012043163,
+      "n": 1.468
+    },
+    "e63": {
+      "u": "n33",
+      "v": "n43",
+      "length": 49.62821204693688,
+      "attenuation": 0.16034298497822203,
+      "insertion_loss_db": 0.11871864048003904,
+      "n": 1.468
+    },
+    "e64": {
+      "u": "n34",
+      "v": "n35",
+      "length": 31.5607565646571,
+      "attenuation": 0.20067162639274427,
+      "insertion_loss_db": 0.6610443500058979,
+      "n": 1.468
+    },
+    "e65": {
+      "u": "n34",
+      "v": "n44",
+      "length": 46.22484682935835,
+      "attenuation": 0.2033324640430476,
+      "insertion_loss_db": 0.7094172932331059,
+      "n": 1.468
+    },
+    "e66": {
+      "u": "n35",
+      "v": "n36",
+      "length": 18.703368453857106,
+      "attenuation": 0.2004642370701591,
+      "insertion_loss_db": 0.1383074227993498,
+      "n": 1.468
+    },
+    "e67": {
+      "u": "n35",
+      "v": "n45",
+      "length": 97.10452459439392,
+      "attenuation": 0.18035500343659186,
+      "insertion_loss_db": 0.9933618129442392,
+      "n": 1.468
+    },
+    "e68": {
+      "u": "n36",
+      "v": "n37",
+      "length": 29.350363362029203,
+      "attenuation": 0.19112774539287986,
+      "insertion_loss_db": 0.3922891639702565,
+      "n": 1.468
+    },
+    "e69": {
+      "u": "n36",
+      "v": "n46",
+      "length": 70.45886463501564,
+      "attenuation": 0.1737512844117257,
+      "insertion_loss_db": 0.9884293499070637,
+      "n": 1.468
+    },
+    "e70": {
+      "u": "n37",
+      "v": "n38",
+      "length": 37.037807333116326,
+      "attenuation": 0.18074133894333388,
+      "insertion_loss_db": 0.682143910528468,
+      "n": 1.468
+    },
+    "e71": {
+      "u": "n37",
+      "v": "n47",
+      "length": 88.6669323534554,
+      "attenuation": 0.1637842712336976,
+      "insertion_loss_db": 0.15982509705701967,
+      "n": 1.468
+    },
+    "e72": {
+      "u": "n38",
+      "v": "n39",
+      "length": 69.59932645046084,
+      "attenuation": 0.22450765275880166,
+      "insertion_loss_db": 0.6716513465620518,
+      "n": 1.468
+    },
+    "e73": {
+      "u": "n38",
+      "v": "n48",
+      "length": 21.845423422747515,
+      "attenuation": 0.22121461560585898,
+      "insertion_loss_db": 0.30787336643164487,
+      "n": 1.468
+    },
+    "e74": {
+      "u": "n39",
+      "v": "n40",
+      "length": 86.05668887870976,
+      "attenuation": 0.24864000842700168,
+      "insertion_loss_db": 0.602537645942421,
+      "n": 1.468
+    },
+    "e75": {
+      "u": "n39",
+      "v": "n49",
+      "length": 95.04533540304816,
+      "attenuation": 0.24725933550418197,
+      "insertion_loss_db": 0.2477534976778422,
+      "n": 1.468
+    },
+    "e76": {
+      "u": "n40",
+      "v": "n50",
+      "length": 91.35251093763341,
+      "attenuation": 0.1964589558857152,
+      "insertion_loss_db": 0.40211696708961564,
+      "n": 1.468
+    },
+    "e77": {
+      "u": "n41",
+      "v": "n42",
+      "length": 61.27472330733495,
+      "attenuation": 0.22795674340352762,
+      "insertion_loss_db": 0.7728142924945821,
+      "n": 1.468
+    },
+    "e78": {
+      "u": "n41",
+      "v": "n51",
+      "length": 23.09139583848342,
+      "attenuation": 0.2037889413987733,
+      "insertion_loss_db": 0.11453320379560268,
+      "n": 1.468
+    },
+    "e79": {
+      "u": "n42",
+      "v": "n43",
+      "length": 27.321714547149913,
+      "attenuation": 0.17576851382619502,
+      "insertion_loss_db": 0.14523910039869747,
+      "n": 1.468
+    },
+    "e80": {
+      "u": "n42",
+      "v": "n52",
+      "length": 93.5115116270072,
+      "attenuation": 0.23623131123242608,
+      "insertion_loss_db": 0.36079441056799044,
+      "n": 1.468
+    },
+    "e81": {
+      "u": "n43",
+      "v": "n44",
+      "length": 59.70938389005374,
+      "attenuation": 0.1706130373210606,
+      "insertion_loss_db": 0.418755128753432,
+      "n": 1.468
+    },
+    "e82": {
+      "u": "n43",
+      "v": "n53",
+      "length": 26.249724860402047,
+      "attenuation": 0.16695603845497264,
+      "insertion_loss_db": 0.9809714214090972,
+      "n": 1.468
+    },
+    "e83": {
+      "u": "n44",
+      "v": "n45",
+      "length": 89.5651204776823,
+      "attenuation": 0.18835071112130192,
+      "insertion_loss_db": 0.939760029000823,
+      "n": 1.468
+    },
+    "e84": {
+      "u": "n44",
+      "v": "n54",
+      "length": 67.74145347002326,
+      "attenuation": 0.2214455821774473,
+      "insertion_loss_db": 0.609496288681594,
+      "n": 1.468
+    },
+    "e85": {
+      "u": "n45",
+      "v": "n46",
+      "length": 61.272484702642714,
+      "attenuation": 0.2027947297410211,
+      "insertion_loss_db": 0.7186420961230489,
+      "n": 1.468
+    },
+    "e86": {
+      "u": "n45",
+      "v": "n55",
+      "length": 43.86590525169281,
+      "attenuation": 0.22176478001915517,
+      "insertion_loss_db": 0.10946895468468798,
+      "n": 1.468
+    },
+    "e87": {
+      "u": "n46",
+      "v": "n47",
+      "length": 46.98597539414168,
+      "attenuation": 0.24170053709755052,
+      "insertion_loss_db": 0.4311670783938871,
+      "n": 1.468
+    },
+    "e88": {
+      "u": "n46",
+      "v": "n56",
+      "length": 31.554029141366037,
+      "attenuation": 0.19179458093886959,
+      "insertion_loss_db": 0.46593148949469476,
+      "n": 1.468
+    },
+    "e89": {
+      "u": "n47",
+      "v": "n48",
+      "length": 13.425155802211517,
+      "attenuation": 0.22167545247780407,
+      "insertion_loss_db": 0.43841596244471837,
+      "n": 1.468
+    },
+    "e90": {
+      "u": "n47",
+      "v": "n57",
+      "length": 88.85969272983439,
+      "attenuation": 0.19364479557344827,
+      "insertion_loss_db": 0.15711839166559927,
+      "n": 1.468
+    },
+    "e91": {
+      "u": "n48",
+      "v": "n49",
+      "length": 52.09571951326865,
+      "attenuation": 0.19749774979842355,
+      "insertion_loss_db": 0.23453062933937846,
+      "n": 1.468
+    },
+    "e92": {
+      "u": "n48",
+      "v": "n58",
+      "length": 59.287167929236176,
+      "attenuation": 0.23700303286538021,
+      "insertion_loss_db": 0.40105997487755796,
+      "n": 1.468
+    },
+    "e93": {
+      "u": "n49",
+      "v": "n50",
+      "length": 38.99469788022026,
+      "attenuation": 0.24647806582555032,
+      "insertion_loss_db": 0.7160752023102839,
+      "n": 1.468
+    },
+    "e94": {
+      "u": "n49",
+      "v": "n59",
+      "length": 77.61924278694352,
+      "attenuation": 0.2280536381344591,
+      "insertion_loss_db": 0.9529760632624712,
+      "n": 1.468
+    },
+    "e95": {
+      "u": "n50",
+      "v": "n60",
+      "length": 12.267718372158432,
+      "attenuation": 0.18150412892349985,
+      "insertion_loss_db": 0.6105618727230405,
+      "n": 1.468
+    },
+    "e96": {
+      "u": "n51",
+      "v": "n52",
+      "length": 43.496674530868354,
+      "attenuation": 0.1636653224045106,
+      "insertion_loss_db": 0.1906828191601248,
+      "n": 1.468
+    },
+    "e97": {
+      "u": "n51",
+      "v": "n61",
+      "length": 12.731526494570048,
+      "attenuation": 0.1929928227971909,
+      "insertion_loss_db": 0.7142516655624462,
+      "n": 1.468
+    },
+    "e98": {
+      "u": "n52",
+      "v": "n53",
+      "length": 21.06028919845084,
+      "attenuation": 0.2348524242164981,
+      "insertion_loss_db": 0.33076378222612557,
+      "n": 1.468
+    },
+    "e99": {
+      "u": "n52",
+      "v": "n62",
+      "length": 97.0433411857631,
+      "attenuation": 0.22741694922738465,
+      "insertion_loss_db": 0.30186204170324493,
+      "n": 1.468
+    },
+    "e100": {
+      "u": "n53",
+      "v": "n54",
+      "length": 69.1984657034663,
+      "attenuation": 0.1605450045504698,
+      "insertion_loss_db": 0.14897172246016088,
+      "n": 1.468
+    },
+    "e101": {
+      "u": "n53",
+      "v": "n63",
+      "length": 48.53982217505332,
+      "attenuation": 0.21270027605251493,
+      "insertion_loss_db": 0.5474327914848823,
+      "n": 1.468
+    },
+    "e102": {
+      "u": "n54",
+      "v": "n55",
+      "length": 57.13660971194323,
+      "attenuation": 0.1843382705136489,
+      "insertion_loss_db": 0.10589307274254393,
+      "n": 1.468
+    },
+    "e103": {
+      "u": "n54",
+      "v": "n64",
+      "length": 88.55282877082969,
+      "attenuation": 0.2111209314328061,
+      "insertion_loss_db": 0.8358459731466864,
+      "n": 1.468
+    },
+    "e104": {
+      "u": "n55",
+      "v": "n56",
+      "length": 40.97896002964236,
+      "attenuation": 0.16616903901310406,
+      "insertion_loss_db": 0.7628270116544268,
+      "n": 1.468
+    },
+    "e105": {
+      "u": "n55",
+      "v": "n65",
+      "length": 63.12618840607432,
+      "attenuation": 0.2171088341767661,
+      "insertion_loss_db": 0.5314192949810214,
+      "n": 1.468
+    },
+    "e106": {
+      "u": "n56",
+      "v": "n57",
+      "length": 71.53159360055894,
+      "attenuation": 0.1643507219478447,
+      "insertion_loss_db": 0.9312142747530661,
+      "n": 1.468
+    },
+    "e107": {
+      "u": "n56",
+      "v": "n66",
+      "length": 41.98723993211608,
+      "attenuation": 0.20296968900340684,
+      "insertion_loss_db": 0.4596462647930837,
+      "n": 1.468
+    },
+    "e108": {
+      "u": "n57",
+      "v": "n58",
+      "length": 56.71886378463911,
+      "attenuation": 0.23753278618789614,
+      "insertion_loss_db": 0.861020406085364,
+      "n": 1.468
+    },
+    "e109": {
+      "u": "n57",
+      "v": "n67",
+      "length": 78.87226449506703,
+      "attenuation": 0.22545348577000213,
+      "insertion_loss_db": 0.8464239846100076,
+      "n": 1.468
+    },
+    "e110": {
+      "u": "n58",
+      "v": "n59",
+      "length": 91.82613825914952,
+      "attenuation": 0.17118956328846466,
+      "insertion_loss_db": 0.7848239995723076,
+      "n": 1.468
+    },
+    "e111": {
+      "u": "n58",
+      "v": "n68",
+      "length": 23.595605026913397,
+      "attenuation": 0.1895230674685715,
+      "insertion_loss_db": 0.88074531412145,
+      "n": 1.468
+    },
+    "e112": {
+      "u": "n59",
+      "v": "n60",
+      "length": 94.00774530766857,
+      "attenuation": 0.19332083193881733,
+      "insertion_loss_db": 0.14887355690806792,
+      "n": 1.468
+    },
+    "e113": {
+      "u": "n59",
+      "v": "n69",
+      "length": 10.466097923388894,
+      "attenuation": 0.1972942213093329,
+      "insertion_loss_db": 0.7810993315687251,
+      "n": 1.468
+    },
+    "e114": {
+      "u": "n60",
+      "v": "n70",
+      "length": 77.76797532379786,
+      "attenuation": 0.20508388548814577,
+      "insertion_loss_db": 0.7872705206280715,
+      "n": 1.468
+    },
+    "e115": {
+      "u": "n61",
+      "v": "n62",
+      "length": 82.94741472855206,
+      "attenuation": 0.16317463667794962,
+      "insertion_loss_db": 0.2594477832409261,
+      "n": 1.468
+    },
+    "e116": {
+      "u": "n61",
+      "v": "n71",
+      "length": 22.308764638832336,
+      "attenuation": 0.21072471379385146,
+      "insertion_loss_db": 0.4467823784628684,
+      "n": 1.468
+    },
+    "e117": {
+      "u": "n62",
+      "v": "n63",
+      "length": 47.70132858218666,
+      "attenuation": 0.22121581693031797,
+      "insertion_loss_db": 0.9662988098083798,
+      "n": 1.468
+    },
+    "e118": {
+      "u": "n62",
+      "v": "n72",
+      "length": 83.3730650195541,
+      "attenuation": 0.21938757646304624,
+      "insertion_loss_db": 0.4756266053943399,
+      "n": 1.468
+    },
+    "e119": {
+      "u": "n63",
+      "v": "n64",
+      "length": 11.284407071614954,
+      "attenuation": 0.20881276165990065,
+      "insertion_loss_db": 0.9215438335265534,
+      "n": 1.468
+    },
+    "e120": {
+      "u": "n63",
+      "v": "n73",
+      "length": 66.56157530796617,
+      "attenuation": 0.22056903219959917,
+      "insertion_loss_db": 0.822861547979075,
+      "n": 1.468
+    },
+    "e121": {
+      "u": "n64",
+      "v": "n65",
+      "length": 81.37212922882307,
+      "attenuation": 0.18713665681913802,
+      "insertion_loss_db": 0.7698890411544452,
+      "n": 1.468
+    },
+    "e122": {
+      "u": "n64",
+      "v": "n74",
+      "length": 56.170322453998764,
+      "attenuation": 0.17254882324058757,
+      "insertion_loss_db": 0.7747980547646958,
+      "n": 1.468
+    },
+    "e123": {
+      "u": "n65",
+      "v": "n66",
+      "length": 75.32644784959784,
+      "attenuation": 0.2393402733522182,
+      "insertion_loss_db": 0.9102092203480796,
+      "n": 1.468
+    },
+    "e124": {
+      "u": "n65",
+      "v": "n75",
+      "length": 30.378113442742965,
+      "attenuation": 0.17049310549473828,
+      "insertion_loss_db": 0.8468938473163609,
+      "n": 1.468
+    },
+    "e125": {
+      "u": "n66",
+      "v": "n67",
+      "length": 27.866903319340555,
+      "attenuation": 0.1698942870491233,
+      "insertion_loss_db": 0.5305572579544866,
+      "n": 1.468
+    },
+    "e126": {
+      "u": "n66",
+      "v": "n76",
+      "length": 42.681425549531646,
+      "attenuation": 0.22142693767175486,
+      "insertion_loss_db": 0.5358242003605743,
+      "n": 1.468
+    },
+    "e127": {
+      "u": "n67",
+      "v": "n68",
+      "length": 26.146542481043188,
+      "attenuation": 0.19059186419891325,
+      "insertion_loss_db": 0.7154390417462697,
+      "n": 1.468
+    },
+    "e128": {
+      "u": "n67",
+      "v": "n77",
+      "length": 41.14552952012306,
+      "attenuation": 0.21947908975962047,
+      "insertion_loss_db": 0.6246033896490104,
+      "n": 1.468
+    },
+    "e129": {
+      "u": "n68",
+      "v": "n69",
+      "length": 95.33116552697332,
+      "attenuation": 0.2075585798299059,
+      "insertion_loss_db": 0.7351659092101043,
+      "n": 1.468
+    },
+    "e130": {
+      "u": "n68",
+      "v": "n78",
+      "length": 61.599944585000884,
+      "attenuation": 0.19627333510310363,
+      "insertion_loss_db": 0.16189142296810455,
+      "n": 1.468
+    },
+    "e131": {
+      "u": "n69",
+      "v": "n70",
+      "length": 40.606126067875586,
+      "attenuation": 0.20837090591721014,
+      "insertion_loss_db": 0.7511099970194529,
+      "n": 1.468
+    },
+    "e132": {
+      "u": "n69",
+      "v": "n79",
+      "length": 34.43721578279067,
+      "attenuation": 0.186924391685446,
+      "insertion_loss_db": 0.2266760243223391,
+      "n": 1.468
+    },
+    "e133": {
+      "u": "n70",
+      "v": "n80",
+      "length": 95.683554163677,
+      "attenuation": 0.24206570747459072,
+      "insertion_loss_db": 0.8773746982715762,
+      "n": 1.468
+    },
+    "e134": {
+      "u": "n71",
+      "v": "n72",
+      "length": 50.003038868240196,
+      "attenuation": 0.21565907973621873,
+      "insertion_loss_db": 0.8079464383336685,
+      "n": 1.468
+    },
+    "e135": {
+      "u": "n71",
+      "v": "n81",
+      "length": 98.23552757925306,
+      "attenuation": 0.24719247832969796,
+      "insertion_loss_db": 0.6123330826541566,
+      "n": 1.468
+    },
+    "e136": {
+      "u": "n72",
+      "v": "n73",
+      "length": 56.39704021956439,
+      "attenuation": 0.18197635161403058,
+      "insertion_loss_db": 0.6749307914793592,
+      "n": 1.468
+    },
+    "e137": {
+      "u": "n72",
+      "v": "n82",
+      "length": 56.90495161236016,
+      "attenuation": 0.24231343084904083,
+      "insertion_loss_db": 0.721133381258632,
+      "n": 1.468
+    },
+    "e138": {
+      "u": "n73",
+      "v": "n74",
+      "length": 90.68864713444007,
+      "attenuation": 0.1623616352034463,
+      "insertion_loss_db": 0.9254193434762641,
+      "n": 1.468
+    },
+    "e139": {
+      "u": "n73",
+      "v": "n83",
+      "length": 76.84906763935356,
+      "attenuation": 0.22783077297285712,
+      "insertion_loss_db": 0.4616479120576582,
+      "n": 1.468
+    },
+    "e140": {
+      "u": "n74",
+      "v": "n75",
+      "length": 62.25875774675403,
+      "attenuation": 0.24887427004141593,
+      "insertion_loss_db": 0.7495113995519923,
+      "n": 1.468
+    },
+    "e141": {
+      "u": "n74",
+      "v": "n84",
+      "length": 48.39845534526325,
+      "attenuation": 0.23428969736521227,
+      "insertion_loss_db": 0.9488499033248532,
+      "n": 1.468
+    },
+    "e142": {
+      "u": "n75",
+      "v": "n76",
+      "length": 89.03690734764524,
+      "attenuation": 0.16356206182489594,
+      "insertion_loss_db": 0.7969778596330107,
+      "n": 1.468
+    },
+    "e143": {
+      "u": "n75",
+      "v": "n85",
+      "length": 47.048153491619956,
+      "attenuation": 0.1947711791822022,
+      "insertion_loss_db": 0.8821675116088973,
+      "n": 1.468
+    },
+    "e144": {
+      "u": "n76",
+      "v": "n77",
+      "length": 93.04836185516207,
+      "attenuation": 0.23910062703399096,
+      "insertion_loss_db": 0.8457566234524234,
+      "n": 1.468
+    },
+    "e145": {
+      "u": "n76",
+      "v": "n86",
+      "length": 16.184381690967538,
+      "attenuation": 0.23012805270875142,
+      "insertion_loss_db": 0.8148545511624394,
+      "n": 1.468
+    },
+    "e146": {
+      "u": "n77",
+      "v": "n78",
+      "length": 48.69971757110467,
+      "attenuation": 0.1866897250649447,
+      "insertion_loss_db": 0.46587538551375174,
+      "n": 1.468
+    },
+    "e147": {
+      "u": "n77",
+      "v": "n87",
+      "length": 56.75633378900731,
+      "attenuation": 0.1703549401632755,
+      "insertion_loss_db": 0.8475323696754526,
+      "n": 1.468
+    },
+    "e148": {
+      "u": "n78",
+      "v": "n79",
+      "length": 95.58443760236648,
+      "attenuation": 0.21814058282421928,
+      "insertion_loss_db": 0.6514450436049567,
+      "n": 1.468
+    },
+    "e149": {
+      "u": "n78",
+      "v": "n88",
+      "length": 32.58993219982823,
+      "attenuation": 0.1821470235195893,
+      "insertion_loss_db": 0.653532475646431,
+      "n": 1.468
+    },
+    "e150": {
+      "u": "n79",
+      "v": "n80",
+      "length": 82.5435232535898,
+      "attenuation": 0.20090965526630386,
+      "insertion_loss_db": 0.9957419259990551,
+      "n": 1.468
+    },
+    "e151": {
+      "u": "n79",
+      "v": "n89",
+      "length": 70.88240799987341,
+      "attenuation": 0.2376761445463694,
+      "insertion_loss_db": 0.5733845937159014,
+      "n": 1.468
+    },
+    "e152": {
+      "u": "n80",
+      "v": "n90",
+      "length": 74.53773138530107,
+      "attenuation": 0.23276100105688077,
+      "insertion_loss_db": 0.2480545007725045,
+      "n": 1.468
+    },
+    "e153": {
+      "u": "n81",
+      "v": "n82",
+      "length": 66.66599645561831,
+      "attenuation": 0.16912604492139413,
+      "insertion_loss_db": 0.6675857197078275,
+      "n": 1.468
+    },
+    "e154": {
+      "u": "n81",
+      "v": "n91",
+      "length": 97.4404637615422,
+      "attenuation": 0.22541072451450034,
+      "insertion_loss_db": 0.14775079538752112,
+      "n": 1.468
+    },
+    "e155": {
+      "u": "n82",
+      "v": "n83",
+      "length": 39.941331329019235,
+      "attenuation": 0.17808670160780385,
+      "insertion_loss_db": 0.5835411792302264,
+      "n": 1.468
+    },
+    "e156": {
+      "u": "n82",
+      "v": "n92",
+      "length": 45.84480037114335,
+      "attenuation": 0.16565349396299422,
+      "insertion_loss_db": 0.48164755265532977,
+      "n": 1.468
+    },
+    "e157": {
+      "u": "n83",
+      "v": "n84",
+      "length": 28.26205769921646,
+      "attenuation": 0.2033871801512471,
+      "insertion_loss_db": 0.9296287589245082,
+      "n": 1.468
+    },
+    "e158": {
+      "u": "n83",
+      "v": "n93",
+      "length": 14.563364974504346,
+      "attenuation": 0.18841088467562928,
+      "insertion_loss_db": 0.251801626091531,
+      "n": 1.468
+    },
+    "e159": {
+      "u": "n84",
+      "v": "n85",
+      "length": 29.16173754778053,
+      "attenuation": 0.1606757432847077,
+      "insertion_loss_db": 0.20944729543928364,
+      "n": 1.468
+    },
+    "e160": {
+      "u": "n84",
+      "v": "n94",
+      "length": 92.39179574115174,
+      "attenuation": 0.2275779398939042,
+      "insertion_loss_db": 0.500429694219532,
+      "n": 1.468
+    },
+    "e161": {
+      "u": "n85",
+      "v": "n86",
+      "length": 85.61519354425506,
+      "attenuation": 0.17788525384629086,
+      "insertion_loss_db": 0.9397249248898604,
+      "n": 1.468
+    },
+    "e162": {
+      "u": "n85",
+      "v": "n95",
+      "length": 20.11651673433211,
+      "attenuation": 0.2308784486594852,
+      "insertion_loss_db": 0.20292822221486326,
+      "n": 1.468
+    },
+    "e163": {
+      "u": "n86",
+      "v": "n87",
+      "length": 64.34011227851788,
+      "attenuation": 0.18420616194040146,
+      "insertion_loss_db": 0.8644973342736663,
+      "n": 1.468
+    },
+    "e164": {
+      "u": "n86",
+      "v": "n96",
+      "length": 53.127684540066234,
+      "attenuation": 0.22231885010176783,
+      "insertion_loss_db": 0.9509906928361342,
+      "n": 1.468
+    },
+    "e165": {
+      "u": "n87",
+      "v": "n88",
+      "length": 63.52163834394507,
+      "attenuation": 0.16686244942626763,
+      "insertion_loss_db": 0.797870100626857,
+      "n": 1.468
+    },
+    "e166": {
+      "u": "n87",
+      "v": "n97",
+      "length": 69.33475059481569,
+      "attenuation": 0.1668770274259208,
+      "insertion_loss_db": 0.4029957421229645,
+      "n": 1.468
+    },
+    "e167": {
+      "u": "n88",
+      "v": "n89",
+      "length": 37.59935417999847,
+      "attenuation": 0.22756018913577936,
+      "insertion_loss_db": 0.739908976827366,
+      "n": 1.468
+    },
+    "e168": {
+      "u": "n88",
+      "v": "n98",
+      "length": 96.52157602628112,
+      "attenuation": 0.1601906040826219,
+      "insertion_loss_db": 0.2817486395655442,
+      "n": 1.468
+    },
+    "e169": {
+      "u": "n89",
+      "v": "n90",
+      "length": 51.92560315550124,
+      "attenuation": 0.23007163088982052,
+      "insertion_loss_db": 0.21353276135324942,
+      "n": 1.468
+    },
+    "e170": {
+      "u": "n89",
+      "v": "n99",
+      "length": 66.52907693784161,
+      "attenuation": 0.18937410153636403,
+      "insertion_loss_db": 0.2655005562066907,
+      "n": 1.468
+    },
+    "e171": {
+      "u": "n90",
+      "v": "n100",
+      "length": 67.17035655097419,
+      "attenuation": 0.17003090818695815,
+      "insertion_loss_db": 0.8529631707907104,
+      "n": 1.468
+    },
+    "e172": {
+      "u": "n91",
+      "v": "n92",
+      "length": 26.550045685872206,
+      "attenuation": 0.16552075703666516,
+      "insertion_loss_db": 0.5824449534906316,
+      "n": 1.468
+    },
+    "e173": {
+      "u": "n92",
+      "v": "n93",
+      "length": 15.567887634073672,
+      "attenuation": 0.2223403460538317,
+      "insertion_loss_db": 0.15183119678894946,
+      "n": 1.468
+    },
+    "e174": {
+      "u": "n93",
+      "v": "n94",
+      "length": 47.03651411481774,
+      "attenuation": 0.21700840935833032,
+      "insertion_loss_db": 0.4006589637170197,
+      "n": 1.468
+    },
+    "e175": {
+      "u": "n94",
+      "v": "n95",
+      "length": 78.76270795946218,
+      "attenuation": 0.23501907013966855,
+      "insertion_loss_db": 0.8178936599961151,
+      "n": 1.468
+    },
+    "e176": {
+      "u": "n95",
+      "v": "n96",
+      "length": 83.36996094625945,
+      "attenuation": 0.23145145334949818,
+      "insertion_loss_db": 0.45879713574585257,
+      "n": 1.468
+    },
+    "e177": {
+      "u": "n96",
+      "v": "n97",
+      "length": 75.69903241018585,
+      "attenuation": 0.2340293370775371,
+      "insertion_loss_db": 0.666983803609923,
+      "n": 1.468
+    },
+    "e178": {
+      "u": "n97",
+      "v": "n98",
+      "length": 20.18844572727007,
+      "attenuation": 0.19408152087713718,
+      "insertion_loss_db": 0.17260295990987662,
+      "n": 1.468
+    },
+    "e179": {
+      "u": "n98",
+      "v": "n99",
+      "length": 92.2019375377941,
+      "attenuation": 0.16601370214108638,
+      "insertion_loss_db": 0.32626147099454395,
+      "n": 1.468
+    },
+    "e180": {
+      "u": "n99",
+      "v": "n100",
+      "length": 82.18329201975554,
+      "attenuation": 0.18696261800542008,
+      "insertion_loss_db": 0.9347754623024297,
+      "n": 1.468
+    }
+  }
+}
