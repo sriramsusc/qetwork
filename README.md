@@ -1,6 +1,6 @@
 Clone the repo, make it working directory, install requirements(not much numpy and maybe matplot)
 
-move the given CSV files into input_dir
+move the given CSV files into input_dir (input_dir should have only a bunch of csv files and a snapshot subdirectory, no other directopries)
 
 Run the following:
 
