@@ -1,11 +1,26 @@
 """Network benchmarking (Helsen & Wehner, arXiv:2103.01165), fully event-driven.
 
-Every hop advances the clock through the same machinery as EntanglementDistribution:
-`attempt_link` schedules the photon over the fiber, the `on_absorb` herald confirms it,
-loss triggers a real retry, and the teleport correction is a scheduled classical message.
-`timeline.run()` drains each hop's events, so memory T1/T2 decoherence accrues over the
-real elapsed storage time (fiber flight + retries + classical delay). Exact readout + perfect
-prep => no SPAM => the survival fits b_m = f^m and F_path = (1 + f) / 2.
+Transport is the entanglement-distribution stack: every teleport of the data
+qubit rides on an end-to-end pair delivered by EntanglementDistribution (per-node
+agents walking the path link by link -- generation, herald, loss + retry, swaps
+as-ready, one deferred Pauli frame at the destination). One BOUNCE runs that
+distribution in the two directions one after the other: Clifford at the source,
+distribute + teleport S->D, Clifford at the destination, distribute + teleport
+D->S. The data qubit only ever lives at the two ends; interior gate noise enters
+through the swaps, and the data qubit pays memory decoherence for every leg's
+full distribution latency.
+
+mode is EntanglementDistribution's: sequential (absorb->emit baton) or parallel
+(round-grid emission). purify_rounds >= 1 switches the distribution to
+purify-then-swap: every edge is pumped to that level (LinkPumpSession, repeated
+DEJMPS), the kept pairs are swapped into the end-to-end pair; edges pump one
+after another (sequential mode only) and earlier kept pairs decohere while later
+edges pump -- that cost is real.
+
+Exact readout + perfect prep => no SPAM => the survival fits b_m = f^m and
+F_path = (1 + f) / 2; with the detector readout SPAM lands in A, not f.
+measure() is the scalar interface: samples + bounce range + path in,
+(path_fidelity, avg_time_us) out.
 """
 
 from dataclasses import dataclass
@@ -14,7 +29,8 @@ import numpy as np
 
 from qetwork.operations.gates import random_clifford, X, apply_gate
 from qetwork.events.priority import PROTOCOL
-from qetwork.protocols.e_dist_swap import SEQUENTIAL, PARALLEL
+from qetwork.protocols.errors import ProtocolError
+from qetwork.protocols.e_dist_swap import EntanglementDistribution, SEQUENTIAL, PARALLEL
 from qetwork.protocols.link_pump import LinkPumpSession
 
 
@@ -32,39 +48,42 @@ class BenchmarkResult:
 
 
 class NetworkBenchmark:
-    """Hop-by-hop, event-driven network benchmarking over a fixed path."""
+    """Event-driven network benchmarking over a fixed path; the data qubit
+    teleports over end-to-end pairs delivered by EntanglementDistribution."""
 
     def __init__(self, net, path=None, m_min=1, m_max=8, n_samples=40, n_shots=0,
                  purify_rounds=0, calibrate=True, mode=SEQUENTIAL):
         if mode not in (SEQUENTIAL, PARALLEL):
             raise ValueError(f"mode must be {SEQUENTIAL!r} or {PARALLEL!r}, got {mode!r}")
-        # RESERVED knob, validated + stored but with NO behavioral difference yet: the
-        # hop-by-hop bounce pumps each link on demand either way. Intended future meaning:
-        # sequential = pump the next link when the data qubit needs it (current behavior);
-        # parallel = pre-pump all of a sweep's links concurrently before the data hops.
         self.mode = mode
         self.net = net
         self.tl = net.timeline
         self.path = list(path) if path is not None else net.path()
         if len(self.path) < 2:
             raise ValueError(f"path needs at least 2 nodes, got {self.path}")
-        self.nodes = [net.nodes[nid] for nid in self.path]                    # <-- restore
+        self.nodes = [net.nodes[nid] for nid in self.path]
         self.detector = next(iter(self.nodes[0].detectors.values()), None)   # source node's detector, if any
         self.K = len(self.nodes)
         self.m_min, self.m_max, self.n_samples, self.n_shots = m_min, m_max, n_samples, n_shots
         if not isinstance(purify_rounds, int) or isinstance(purify_rounds, bool) or purify_rounds < 0:
             raise ValueError(f"purify_rounds must be an int >= 0, got {purify_rounds!r}")
+        if purify_rounds >= 1 and mode == PARALLEL:
+            raise ValueError("purified distribution pumps edges sequentially; "
+                             "parallel mode is not supported with it")
         self.purify_rounds = purify_rounds
-        self.calibrate = calibrate        
+        self.calibrate = calibrate
         for end in (self.nodes[0], self.nodes[-1]):
             if not end.unbound_mems():
                 raise ValueError(f"path endpoint {end.node_id!r} needs a spare (unbound) memory "
                                  f"to park the data qubit at the turnaround")
+        # pump sessions replace the raw agents' hooks, so the two transports are
+        # mutually exclusive per benchmark instance
+        self.dist = (EntanglementDistribution(net, self.path, mode=mode)
+                     if purify_rounds < 1 else None)
+        self.s_half_id = self.path[1]     # source's pair half lives in link_mems[here]
+        self.d_half_id = self.path[-2]    # destination's half
 
-    # --- fiber delays, read straight off the wired components ---
-
-    def _qdelay(self, A, B):
-        return A.ports[f"q:{B.node_id}"].qfiber.delay
+    # --- small verbs ---
 
     def _cdelay(self, A, B):
         cf = A.cfibers[B.node_id]
@@ -82,36 +101,6 @@ class NetworkBenchmark:
         data.key, data._load_time = None, None
         return spare
 
-    # --- one hop, fully event-driven (photon over the fiber, herald, retry, correction) ---
-
-    def _generate_link(self, A, B):
-        tl = self.tl
-        A_id, B_id = A.node_id, B.node_id
-        rtt = self._qdelay(A, B) + self._cdelay(B, A)
-        fired = []
-        B.absorb_hooks[A_id] = lambda nbr: fired.append(nbr)
-        while not fired:                             # real loss + retry over the fiber
-            A.link_mems[B_id].reset()
-            t0 = tl.now()
-            A.attempt_link(B_id)                     # schedules the photon at t0 + qdelay
-            tl.schedule(self._noop, at=t0 + rtt + 1, priority=PROTOCOL)   # sender timeout tick
-            tl.run()                                 # photon arrives (herald or loss) + timeout fires
-        B.absorb_hooks.pop(A_id, None)
-
-    def _raw_hop(self, A, B, data):
-        tl = self.tl
-        if data is A.link_mems[B.node_id]:           # turnaround: park off the slot we need
-            data = self._park(A, data)
-        self._generate_link(A, B)                    # clock now at t0 + rtt + 1
-        m1, m2 = A.bsm(data, A.link_mems[B.node_id]) # decoheres data + idler over real storage
-        link_b = B.link_mems[A.node_id]
-        tl.schedule(self._do_correct, B, link_b, m1, m2,
-                    at=tl.now() + self._cdelay(A, B), priority=PROTOCOL)
-        tl.run()                                     # bits fly cdelay, then correct (decoheres signal)
-        return link_b
-
-    # --- one RB sequence of m bounces ---
-
     def _apply_clifford(self, node, data, u_total, rng):
         u = random_clifford(rng)
         apply_gate(self.tl.state_tracker, (data.key,), u, node.p_depol_1q, coherent=node.coherent_1q)
@@ -122,22 +111,79 @@ class NetworkBenchmark:
             for mem in list(node.memories):
                 mem.reset()
 
+    # --- one leg: distribute an end-to-end pair, teleport `data` over it ---
+
+    def _teleport(self, A, B, data):
+        """Distribute one end-to-end pair (raw or purified), then teleport `data`
+        from A to B over it.
+
+        The BSM settles `data`'s decoherence over the whole distribution wait; the
+        correction lands after bsm_duration + the classical A->B flight."""
+        tl = self.tl
+        a_half_id = self.s_half_id if A is self.nodes[0] else self.d_half_id
+        b_half_id = self.d_half_id if B is self.nodes[-1] else self.s_half_id
+        if self.purify_rounds >= 1:
+            data, pair_a, pair_b = self._purified_pair(A, B, a_half_id, b_half_id, data)
+        else:
+            if data is A.link_mems[a_half_id]:    # dist.reset() would wipe the data qubit
+                data = self._park(A, data)
+            self.dist.reset()
+            if self.dist.run() is None:
+                raise ProtocolError("entanglement distribution starved before delivering")
+            pair_a, pair_b = A.link_mems[a_half_id], B.link_mems[b_half_id]
+        m1, m2 = A.bsm(data, pair_a)
+        tl.schedule(self._do_correct, B, pair_b, m1, m2,
+                    at=tl.now() + A.bsm_duration + self._cdelay(A, B),
+                    priority=PROTOCOL)
+        tl.run()                                  # bits fly, correction settles pair_b
+        return pair_b
+
+    def _purified_pair(self, A, B, a_half_id, b_half_id, data):
+        """Purify-then-swap: pump every edge to purify_rounds kept pairs, swap the
+        kept pairs into one end-to-end pair (single XOR Pauli frame, corrected at
+        the path destination). Returns (data, A's half, B's half); `data` moves to
+        a spare first when it occupies a slot the pumping would recycle."""
+        tl = self.tl
+        kept_a = A.ensure_memory(f"purify:kept:{a_half_id}")
+        if data is A.link_mems[a_half_id] or data is kept_a:
+            data = self._park(A, data)
+        for u, v in zip(self.path, self.path[1:]):       # pump edge by edge
+            LinkPumpSession(self.net, u, v, rounds=self.purify_rounds,
+                            calibrate=self.calibrate).run()
+        dest = self.nodes[-1]
+        kept_dest = dest.memory(f"purify:kept:{self.d_half_id}")
+        if self.K > 2:                                   # swap cascade + one frame
+            acc1 = acc2 = 0
+            latest = tl.now()
+            for i in range(1, self.K - 1):
+                node = self.nodes[i]
+                m1, m2 = node.bsm(node.memory(f"purify:kept:{self.path[i - 1]}"),
+                                  node.memory(f"purify:kept:{self.path[i + 1]}"))
+                acc1 ^= m1
+                acc2 ^= m2
+                latest = max(latest, tl.now() + node.bsm_duration + self._cdelay(node, dest))
+            tl.schedule(self._do_correct, dest, kept_dest, acc1, acc2,
+                        at=latest, priority=PROTOCOL)
+            tl.schedule(self._noop, at=latest + dest.correct_duration, priority=PROTOCOL)
+            tl.run()                                     # frame lands, pair is standard
+        return data, A.memory(f"purify:kept:{a_half_id}"), B.memory(f"purify:kept:{b_half_id}")
+
+    # --- one RB sequence of m bounces ---
+
     def _one_sequence(self, m, rng):
         tracker = self.tl.state_tracker
-        a1 = self.nodes[0]
-        data = next(mm for mm in a1.unbound_mems() if mm.is_empty())
+        S, D = self.nodes[0], self.nodes[-1]
+        data = next(mm for mm in S.unbound_mems() if mm.is_empty())
         data.initialize()
         u_total = np.eye(2, dtype=complex)
         for _ in range(m):
-            for k in range(self.K - 1):
-                u_total = self._apply_clifford(self.nodes[k], data, u_total, rng)
-                data = self._hop(self.nodes[k], self.nodes[k + 1], data)
-            for k in range(self.K - 1, 0, -1):
-                u_total = self._apply_clifford(self.nodes[k], data, u_total, rng)
-                data = self._hop(self.nodes[k], self.nodes[k - 1], data)
+            u_total = self._apply_clifford(S, data, u_total, rng)
+            data = self._teleport(S, D, data)
+            u_total = self._apply_clifford(D, data, u_total, rng)
+            data = self._teleport(D, S, data)
         p = int(rng.integers(0, 2))
         g_inv = (X if p else np.eye(2, dtype=complex)) @ u_total.conj().T
-        apply_gate(tracker, (data.key,), g_inv, a1.p_depol_1q, coherent=a1.coherent_1q)
+        apply_gate(tracker, (data.key,), g_inv, S.p_depol_1q, coherent=S.coherent_1q)
         if self.detector is None:                          # exact readout: no SPAM
             rho00 = float(tracker.get(data.key).matrix[0, 0].real)
             p_correct = rho00 if p == 0 else 1.0 - rho00
@@ -159,6 +205,7 @@ class NetworkBenchmark:
         arm = new[-1][0]
         return 1.0 if arm == ("eig1" if p == 0 else "eig2") else -1.0
 
+    # --- drivers ---
 
     def run(self) -> BenchmarkResult:
         rng = self.tl.rng
@@ -169,29 +216,24 @@ class NetworkBenchmark:
         f, F_path, A = fit_decay(decay, spam=self.detector is not None)
         return BenchmarkResult(self.path, self.K - 1, f, F_path, A, decay, raw, self.tl.now())
 
-    def _hop(self, A, B, data):
-        if self.purify_rounds < 1:
-            return self._raw_hop(A, B, data)
-        return self._purified_hop(A, B, data)
+    def measure(self):
+        """The scalar interface: (path_fidelity, avg_time_us).
 
-    def _purified_hop(self, A, B, data):
-        """Teleport `data` over a link-purified pair instead of a raw one. Memory
-        decoherence on `data` accrues over the full pump time -- that is the point."""
-        tl = self.tl
-        kept_a_name = f"purify:kept:{B.node_id}"
-        # turnaround: park the data qubit off any slot this hop's session will use
-        if data is A.link_mems[B.node_id] or data is A.ensure_memory(kept_a_name):
-            data = self._park(A, data)
-        session = LinkPumpSession(self.net, A.node_id, B.node_id,
-                                  rounds=self.purify_rounds, calibrate=self.calibrate)
-        session.run()                                # install -> pump -> uninstall (blocking)
-        kept_a = A.memory(kept_a_name)
-        kept_b = B.memory(f"purify:kept:{A.node_id}")
-        m1, m2 = A.bsm(data, kept_a)                 # decoheres data over the real pump time
-        tl.schedule(self._do_correct, B, kept_b, m1, m2,
-                    at=tl.now() + self._cdelay(A, B), priority=PROTOCOL)
-        tl.run()
-        return kept_b
+        path_fidelity = F_path = (1 + f)/2 from the b_m = A*f^m fit (SPAM-robust);
+        avg_time_us = (sum_m time_m / m) / n_m where time_m is the virtual clock
+        the whole m-group of sequences consumed."""
+        rng = self.tl.rng
+        self._cleanup()
+        raw, time_m = {}, {}
+        for m in range(self.m_min, self.m_max + 1):
+            t0 = self.tl.now()
+            vals = [self._one_sequence(m, rng) for _ in range(self.n_samples)]
+            time_m[m] = self.tl.now() - t0                       # clock this m-group burned
+            raw[m] = [v for v in vals if v is not None]          # post-select clicks
+        decay = {m: (float(np.mean(v)) if v else 0.0) for m, v in raw.items()}
+        _f, f_path, _a = fit_decay(decay, spam=self.detector is not None)
+        avg_time = sum(time_m[m] / m for m in time_m) / len(time_m)   # (sum_m time_m/m)/n_m, ps
+        return f_path, avg_time / 1e6                             # us
 
 
 

@@ -92,11 +92,17 @@ class MemoryQubit:
     def decohere(self) -> None:
         if self.is_empty():
             return
-        elapsed = self.timeline.now() - self._load_time
+        now = self.timeline.now()
+        elapsed = now - self._load_time
+        if elapsed == 0:                       # same tick: T1 (gamma=0) and T2 (factor=1) are identities
+            return
         tracker = self.timeline.state_tracker
-        T1(tracker, (self.key,), elapsed, self.t1)
-        T2(tracker, (self.key,), elapsed, self._t2_star())
-        self._load_time = self.timeline.now()
+        if not math.isinf(self.t1):            # T1=inf -> gamma=0 -> identity channel
+            T1(tracker, (self.key,), elapsed, self.t1)
+        t2_star = self._t2_star()
+        if not math.isinf(t2_star):            # T2*=inf -> dephasing factor=1 -> identity channel
+            T2(tracker, (self.key,), elapsed, t2_star)
+        self._load_time = now
 
     def reset(self) -> None:
         """Clear the memory, tracing out its qubit if one is held.

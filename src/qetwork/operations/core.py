@@ -1,5 +1,7 @@
 """Core primitives shared by all operations."""
 
+from functools import lru_cache
+
 import numpy as np
 
 def _embed(op: np.ndarray, indices: tuple[int, ...], n: int) -> np.ndarray:
@@ -31,7 +33,9 @@ def _apply_unitary(rho: np.ndarray, U: np.ndarray, indices: tuple[int, ...]) -> 
 
     return E @ rho @ E.conj().T
 
-def _eigenprojectors(A: np.ndarray):
+@lru_cache(maxsize=None)
+def _eigenprojectors_cached(shape: tuple, data: bytes):
+    A = np.frombuffer(data, dtype=complex).reshape(shape)
     eigvals, eigvecs = np.linalg.eigh(A)
     outcomes, projectors, used =[], [], np.zeros(len(eigvals), dtype = bool)
     for i in range(len(eigvals)):
@@ -44,8 +48,23 @@ def _eigenprojectors(A: np.ndarray):
         outcomes.append(eigvals[i].real)
     return outcomes, projectors
 
+
+def _eigenprojectors(A: np.ndarray):
+    """Spectral decomposition of a Hermitian observable into (eigenvalues, projectors).
+
+    Memoized on the matrix content: projective measurements repeat the same few
+    observables (Pauli Z overwhelmingly), so the eigendecomposition runs once per
+    distinct A. The returned lists are SHARED across calls -- read-only downstream."""
+    Ac = np.ascontiguousarray(A, dtype=complex)
+    return _eigenprojectors_cached(Ac.shape, Ac.tobytes())
+
 def _apply_kraus(rho: np.ndarray, kraus, indices: tuple[int, ...]) -> np.ndarray:
-    """Apply a Kraus channel: rho -> sum_i K_i rho K_i^dag, embedded at `indices`."""
+    """Apply a Kraus channel: rho -> sum_i K_i rho K_i^dag, embedded at `indices`.
+
+    Trace preservation (sum K^dag K == I) is a PRECONDITION, validated where each
+    Kraus set is built -- a constant of the channel -- not re-checked on every
+    application: _depol_kraus verifies its cached set per (k, p), and T1's set is
+    analytically complete for every gamma. Callers must pass a complete set."""
     # CITE kraus-opsum | operator-sum representation: a CPTP map is sum_i K_i rho K_i^dag with sum_i K_i^dag K_i = I | Nielsen & Chuang, "Quantum Computation and Quantum Information", 10th Anniv. Ed., §8.2.3 "Operator-sum representation", Cambridge Univ. Press (2010)
     n = rho.shape[0].bit_length() - 1
     if rho.shape != (2**n, 2**n):
@@ -58,12 +77,6 @@ def _apply_kraus(rho: np.ndarray, kraus, indices: tuple[int, ...]) -> np.ndarray
     for K in kraus:
         if K.shape != (2**k, 2**k):
             raise ValueError(f"each Kraus op must be 2^{k} x 2^{k} for {k} targets, got {K.shape}")
-
-    # completeness on the small (unembedded) space — cheap; embedding preserves it
-    total = sum(K.conj().T @ K for K in kraus)
-    if not np.allclose(total, np.eye(2**k)):
-        raise ValueError(f"Kraus ops are not trace-preserving: sum K^dag K deviates from I "
-                         f"by {np.max(np.abs(total - np.eye(2**k))):.3e}")
 
     out = np.zeros(rho.shape, dtype=np.result_type(rho.dtype, complex))
     for K in kraus:

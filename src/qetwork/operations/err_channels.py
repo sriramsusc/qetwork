@@ -1,4 +1,6 @@
 import math
+from functools import lru_cache
+
 import numpy as np
 
 from qetwork.operations.core import _embed
@@ -62,23 +64,37 @@ Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
 
 
+@lru_cache(maxsize=None)
 def _paulis(k: int):
-    """All 4^k k-qubit Pauli products, identity-first (index 0 is I^(x)k)."""
+    """All 4^k k-qubit Pauli products, identity-first (index 0 is I^(x)k).
+
+    Cached: the basis is a constant of k. The returned tuple is SHARED across calls
+    -- read it, never mutate its arrays in place."""
     out = []
     for combo in product((I, X, Y, Z), repeat=k):
         M = combo[0]
         for P in combo[1:]:
             M = np.kron(M, P)
         out.append(M)
-    return out
+    return tuple(out)
 
 
+@lru_cache(maxsize=None)
 def _depol_kraus(k: int, p: float):
-    """Kraus set for the k-qubit depolarizing channel."""
+    """Kraus set for the k-qubit depolarizing channel.
+
+    Cached by (k, p): the set is a constant of those two, and p is a fixed per-node
+    value, so distinct keys stay few. Trace preservation is verified HERE, once per
+    (k, p), rather than on every channel application. The returned tuple is SHARED
+    -- read it, never mutate its arrays in place."""
     # CITE depolarizing | k-qubit depolarizing channel: rho -> (1-p) rho + p/(4^k-1) sum_{P != I} P rho P; Kraus ops sqrt(1-p) I and sqrt(p/(4^k-1)) P are complete since P^dag P = I | Nielsen & Chuang (2010), §8.3.4 "Depolarizing channel"
     paulis = _paulis(k)
     w = p / (4**k - 1)
-    return [np.sqrt(1 - p) * paulis[0]] + [np.sqrt(w) * P for P in paulis[1:]]
+    kraus = (np.sqrt(1 - p) * paulis[0],) + tuple(np.sqrt(w) * P for P in paulis[1:])
+    total = sum(K.conj().T @ K for K in kraus)
+    if not np.allclose(total, np.eye(2**k)):
+        raise ValueError(f"depolarizing Kraus set for k={k}, p={p} is not trace-preserving")
+    return kraus
 
 
 def depolarize(tracker, keys: tuple[int, ...], p: float) -> None:

@@ -10,11 +10,15 @@ class StateTracker:
         self._counter: int = 0
 
     def new(self, matrix = None) -> int:
+        external = matrix is not None
         if matrix is None:
             matrix = np.array([[1,0],[0,0]], dtype=complex)
         key = self._counter
         self._counter += 1
-        self.states[key] = State(matrix, (key,))
+        state = State(matrix, (key,))
+        if external:                      # unknown provenance: full density-operator invariants
+            state.check_physical()
+        self.states[key] = state
         return key
 
     def get(self, key: int) -> State:

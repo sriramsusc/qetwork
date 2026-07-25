@@ -1,6 +1,7 @@
 """run: pipeline over one existing topology file — path sets -> error-stamped datasets.
 
-    python run.py <topology.json> [--hop-range LO HI] [--n-datasets K]
+    python gen_pathsets.py <topology.json> --total-paths T
+                  [--hop-range LO HI] [--n-datasets K]
                   [--split-seed S] [--error-seed S]
 
 For any <stem>.json every output lands under a fresh <stem>/ next to this
@@ -42,6 +43,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(
         description="Generate path sets and error datasets for one topology JSON.")
     ap.add_argument("topology", type=Path, help="existing topology JSON file")
+    ap.add_argument("--total-paths", type=int, required=True,
+                    help="total sampled paths (train+test together), "
+                         "water-filled across the hop counts")
     ap.add_argument("--hop-range", type=int, nargs=2, metavar=("LO", "HI"),
                     default=None,
                     help="sampled hop counts, inclusive (required for kinds "
@@ -60,7 +64,8 @@ def main() -> None:
     run_dir.mkdir(exist_ok=True)
 
     t0 = time.perf_counter()
-    generate_datasets(topo, seed=args.split_seed, out_dir=run_dir,
+    generate_datasets(topo, total_paths=args.total_paths,
+                      seed=args.split_seed, out_dir=run_dir,
                       hop_range=tuple(args.hop_range) if args.hop_range else None)
     raw_dir = _adopt(run_dir / f"{spec.name}_raw_paths", run_dir / "raw_paths")
     print(f"[1/2] path sets -> {raw_dir}  ({time.perf_counter() - t0:.1f}s)")

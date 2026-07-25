@@ -45,7 +45,7 @@ _RETRIES = 4          # penalized re-solves before declaring an edge forced
 MAX_PATHS = 1200
 TEST_SHARE = 9        # one path in TEST_SHARE of every hop-count bucket goes to the test set
 HOP_RANGE = {"grid": (11, 19)}   # per generator kind: sampled hop counts, inclusive
-PER_LENGTH = 44       # paths wanted per hop count; grid: 5 odd counts * (40 train + 4 test) = 220
+PER_LENGTH = 44       # sample_paths_by_length default when called standalone
 _DRY_STREAK = 5000    # sampler attempts without a new distinct path before a bucket closes
 
 
@@ -262,20 +262,50 @@ def _validate(paths: list[list[str]], spec: TopologySpec, label: str) -> None:
         raise RuntimeError(f"{label}: duplicate paths")
 
 
-def generate_datasets(topology, *, per_length: int = PER_LENGTH,
+def _allocate_slots(capacity: dict[int, int], total: int) -> dict[int, int]:
+    """Water-fill total path slots over hop-count buckets.
+
+    Every bucket starts from an equal share of total; a bucket holding fewer
+    paths than its share is capped at what it has and its unused slots are
+    re-divided equally among the buckets with paths to spare, so per-bucket
+    quotas grow until total is met or every bucket is drained. Shares that do
+    not divide evenly hand their remainder to the lowest hop counts first."""
+    alloc = {L: 0 for L in capacity}
+    budget = min(total, sum(capacity.values()))
+    open_ = {L for L, c in capacity.items() if c}
+    while budget and open_:
+        share, extra = divmod(budget, len(open_))
+        capped = {L for L in open_ if capacity[L] <= share}
+        if capped:                # settle starved buckets, re-divide over the rest
+            for L in capped:
+                alloc[L] = capacity[L]
+                budget -= capacity[L]
+            open_ -= capped
+        else:                     # the share fits everywhere: assign and stop
+            for i, L in enumerate(sorted(open_)):
+                alloc[L] = share + (1 if i < extra else 0)
+                budget -= alloc[L]
+            open_ = set()
+    return alloc
+
+
+def generate_datasets(topology, *, total_paths: int,
                       hop_range: tuple[int, int] | None = None,
                       seed: int | None = None, out_dir=None) -> dict[str, Path]:
     """Write <name>_raw_paths/<name>_{prior,train,test}.csv under out_dir;
     return the CSV paths.
 
-    train/test are per_length sampled paths per hop count in hop_range
-    (default: HOP_RANGE[<generator kind>] from the spec's provenance), split
-    1 in TEST_SHARE within every hop-count bucket so both sets keep the same
-    hop-count distribution; buckets that cannot fill their quota contribute
-    what exists, and the shortfall is reported. out_dir defaults to the
-    topology file's directory (cwd if a TopologySpec object was passed
-    instead of a file); the <name>_raw_paths subdirectory is created if
-    missing."""
+    train/test together hold total_paths sampled paths over hop_range
+    (default: HOP_RANGE[<generator kind>] from the spec's provenance). Every
+    hop count starts from an equal share of total_paths; slots a hop count
+    cannot fill — too few distinct paths, or infeasible outright — are
+    re-divided equally among the hop counts with paths to spare, so per-bucket
+    quotas float upward while the total stays fixed. The output comes up short
+    only when the whole range holds fewer than total_paths distinct paths.
+    The split takes 1 in TEST_SHARE within every bucket so train and test keep
+    the same hop-count distribution. out_dir defaults to the topology file's
+    directory (cwd if a TopologySpec object was passed instead of a file); the
+    <name>_raw_paths subdirectory is created if missing."""
     spec = _as_spec(topology)
     if hop_range is None:
         kind = spec.provenance.get("generator")
@@ -284,9 +314,9 @@ def generate_datasets(topology, *, per_length: int = PER_LENGTH,
             raise ValueError(f"no hop range configured for generator {kind!r}; "
                              f"add it to HOP_RANGE or pass hop_range=")
     lo_h, hi_h = hop_range
-    if per_length < TEST_SHARE:
-        raise ValueError(f"per_length={per_length} cannot fund a stratified test "
-                         f"split; need at least TEST_SHARE={TEST_SHARE} per bucket")
+    if total_paths < TEST_SHARE:
+        raise ValueError(f"total_paths={total_paths} cannot fund a stratified test "
+                         f"split; need at least TEST_SHARE={TEST_SHARE} in one bucket")
     if out_dir is None:
         out_dir = Path.cwd() if isinstance(topology, TopologySpec) \
             else Path(topology).resolve().parent
@@ -301,8 +331,11 @@ def generate_datasets(topology, *, per_length: int = PER_LENGTH,
     missing = sorted(e for e, p in per_edge.items() if p is None)
     _validate(prior, spec, "prior")
 
-    buckets = sample_paths_by_length(spec, min_hops=lo_h, max_hops=hi_h,
-                                     per_length=per_length, seed=seed)
+    pools = sample_paths_by_length(spec, min_hops=lo_h, max_hops=hi_h,
+                                   per_length=total_paths, seed=seed)
+    capacity = {L: len(pools.get(L, [])) for L in range(lo_h, hi_h + 1)}
+    alloc = _allocate_slots(capacity, total_paths)
+    buckets = {L: pools[L][:alloc[L]] for L in sorted(pools) if alloc[L]}
     sampled = [p for L in sorted(buckets) for p in buckets[L]]
     _validate(sampled, spec, "sampled")
     rng = make_rng(seed)
@@ -327,20 +360,17 @@ def generate_datasets(topology, *, per_length: int = PER_LENGTH,
 
     print(f"{spec.name}: prior {len(prior)}/{len(per_edge)} edges"
           + (f" (no path for {missing})" if missing else ""))
-    print(f"sampled {len(sampled)} paths ({per_length} wanted per hop count "
-          f"{lo_h}..{hi_h}); split train {len(train)} / test {len(test)}")
-    infeasible = [L for L in range(lo_h, hi_h + 1) if L not in buckets]
-    if infeasible:
-        print(f"  no possible path at hop counts {infeasible}")
-    short = {L: len(b) for L, b in buckets.items() if len(b) < per_length}
-    if short:
-        print("  !! under quota: "
-              + ", ".join(f"{L} hops: {n}" for L, n in sorted(short.items())))
+    print(f"sampled {len(sampled)}/{total_paths} paths (hop counts {lo_h}..{hi_h}, "
+          f"equal share {total_paths // (hi_h - lo_h + 1)}/bucket); "
+          f"split train {len(train)} / test {len(test)}")
+    empty = [L for L, c in sorted(capacity.items()) if c == 0]
+    if empty:
+        print(f"  no path at hop counts {empty}")
+    print("  allocation: "
+          + ", ".join(f"{L}: {n}" for L, n in sorted(alloc.items()) if n))
+    if len(sampled) < total_paths:
+        print(f"  !! whole range holds only {len(sampled)} distinct paths; "
+              f"{total_paths - len(sampled)} slots unfilled")
     for kind, p in outs.items():
         print(f"  {kind}: {p}")
     return outs
-
-
-if __name__ == "__main__":
-    here = Path(__file__).resolve().parent
-    generate_datasets(here / "grid10x10.json")

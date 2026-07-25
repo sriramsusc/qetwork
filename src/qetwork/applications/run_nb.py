@@ -1,37 +1,36 @@
-"""Batch network benchmarking over error-stamped dataset CSVs, with optional
-link-level purified hops.
+"""Batch network benchmarking over error-stamped dataset CSVs: a thin driver
+that feeds each CSV path to protocols.net_benchmarking and writes the outputs.
 
-    python -m qetwork.applications.run_nb <in> <out> \\
+    python -m qetwork.applications.run_nb <in> [--out-root DIR] \\
         [--purification] [--purification-rounds R] [--protocol seq|par] \\
         [--samples N] [--jobs J] [--fresh]
 
-<in> is either one *_datasets.csv (then <out> is the results CSV) or a
-directory of them (then <out> is a directory; each X.csv lands as
-X_results.csv, and existing *_results.csv files are skipped as inputs).
+<in> is one *_datasets.csv or a directory of them (existing *_results.csv
+files are skipped as inputs). Every X.csv lands as X_results.csv inside a
+directory named <topology>_<protocol>: the topology is recovered from the
+input's filename (<name>_{prior,test,train_ds<k>}_datasets.csv -> <name>;
+any other stem is used as-is) and the protocol tag is seq|par, extended to
+e.g. seq-pur2 when purifying so raw and purified runs never collide. The
+directory is created under --out-root (default: run_nb_res/ next to this
+script).
 
 Reads every row of each input CSV, rebuilds each path as a linear chain (per-node
 gates/source/T1-T2 from the pipe-lists, per-edge fiber, and the endpoint
-MZI+SNSPD detectors from the d1_*/d2_* scalars), runs the event-driven
-NetworkBenchmark (Helsen & Wehner, arXiv:2103.01165), and writes ONE output CSV
-row per path:
+MZI+SNSPD detectors from the d1_*/d2_* scalars), runs NetworkBenchmark.measure()
+(Helsen & Wehner over EntanglementDistribution transport -- see the protocol
+module for the physics), and writes ONE output CSV row per path:
 
     DatasetID, PathID, PathString, path_fidelity, avg_time_us
 
-  * path_fidelity = F_path = (1 + f)/2 from the b_m = A*f^m fit (SPAM-robust:
-    detector noise lands in A, not f).
-  * avg_time_us   = ( sum_m time_m / m ) / n_m, in microseconds, where time_m is
-    the virtual clock the whole m-group of sequences consumed (_TimedNB below).
-
 Flags:
-  --purification            purify every hop's link (LinkPumpSession: standard
-                            repeated DEJMPS with per-pair source-phase calibration)
+  --purification            purify-then-swap distribution: pump every edge's
+                            link (LinkPumpSession, repeated DEJMPS), swap the
+                            kept pairs into the end-to-end pair
   --purification-rounds R   pump level, 1..5 consecutive successes (default 1);
                             only valid together with --purification
-  --protocol seq|par        distribution protocol handed to the benchmark's
-                            `mode`. RESERVED for the hop-by-hop bounce: validated
-                            and recorded, no behavioral difference yet (future:
-                            seq = pump links on demand, par = pre-pump a sweep's
-                            links concurrently).
+  --protocol seq|par        EntanglementDistribution mode: sequential
+                            absorb->emit baton or parallel round-grid emission
+                            (par is invalid with --purification)
   --samples N               RB sequences per m (default 40; the detector readout
                             is one click per sequence, so raise it for clean fits)
   --jobs J                  worker processes (default 1; 0 = all cores). Every row
@@ -61,9 +60,8 @@ import copy
 import csv
 import json
 import os
+import re
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, as_completed, wait
-
-import numpy as np
 
 from qetwork.kernel.timeline import Timeline
 from qetwork.topologies.topology_spec import TopologySpec
@@ -71,7 +69,9 @@ from qetwork.topologies.topos.topology_generator import (
     DEFAULT_NODE, DEFAULT_EDGE, DEFAULT_NETWORK, DEFAULT_DETECTOR,
 )
 from qetwork.protocols.e_dist_swap import SEQUENTIAL, PARALLEL
-from qetwork.protocols.net_benchmarking import NetworkBenchmark, fit_decay
+from qetwork.protocols.net_benchmarking import NetworkBenchmark
+
+OUT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_nb_res")
 
 M_MIN, M_MAX = 1, 8            # bounce range of the RB fit
 SEED = 1                       # base seed; row i runs with SEED + i
@@ -169,33 +169,10 @@ def build_chain_spec(row, use_detector=True):
     }
 
 
-class _TimedNB(NetworkBenchmark):
-    """NetworkBenchmark + per-m clock accounting, so we can form the avg_time metric.
-
-    Only measurement/bookkeeping is added; the physics (per-hop bounce, optional
-    link-level purification) is entirely the base class's. measure() mirrors run()
-    but splits the virtual clock per m-group instead of returning one total.
-    """
-
-    def measure(self):
-        rng = self.tl.rng
-        self._cleanup()
-        raw, time_m = {}, {}
-        for m in range(self.m_min, self.m_max + 1):
-            t0 = self.tl.now()
-            vals = [self._one_sequence(m, rng) for _ in range(self.n_samples)]
-            time_m[m] = self.tl.now() - t0                       # clock this m-group burned
-            raw[m] = [v for v in vals if v is not None]          # post-select clicks
-        decay = {m: (float(np.mean(v)) if v else 0.0) for m, v in raw.items()}
-        _f, f_path, _a = fit_decay(decay, spam=self.detector is not None)
-        avg_time = sum(time_m[m] / m for m in time_m) / len(time_m)   # (sum_m time_m/m)/n_m, ps
-        return f_path, avg_time / 1e6                             # us
-
-
 def run_one(row, *, rounds, mode, samples, seed):
     net = TopologySpec(build_chain_spec(row, USE_DETECTOR)).materialize(Timeline(seed=seed))
-    nb = _TimedNB(net, net.path(), m_min=M_MIN, m_max=M_MAX, n_samples=samples,
-                  purify_rounds=rounds, calibrate=CALIBRATE, mode=mode)
+    nb = NetworkBenchmark(net, net.path(), m_min=M_MIN, m_max=M_MAX, n_samples=samples,
+                          purify_rounds=rounds, calibrate=CALIBRATE, mode=mode)
     return nb.measure()
 
 
@@ -224,6 +201,24 @@ def _result_name(incsv):
     return os.path.splitext(os.path.basename(incsv))[0] + "_results.csv"
 
 
+_PART_RE = re.compile(r"_(prior|test|train_ds\d+)$")
+
+
+def _topology_name(incsv):
+    """ws-100-k4-p0.4-seed7_train_ds3_datasets.csv -> ws-100-k4-p0.4-seed7;
+    a stem without the dataset suffixes is used as-is."""
+    stem = os.path.splitext(os.path.basename(incsv))[0]
+    stem = stem.removesuffix("_datasets")
+    return _PART_RE.sub("", stem)
+
+
+def _out_dir(incsv, root, tag):
+    """<root>/<topology>_<tag>, created on demand."""
+    d = os.path.join(root, f"{_topology_name(incsv)}_{tag}")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
 def _discover(indir):
     """The dataset CSVs of one directory, sorted; *_results.csv outputs are
     skipped so out-dir == in-dir round-trips cleanly."""
@@ -249,6 +244,7 @@ def _meta(incsv, base_cfg):
         "schema": 1,
         "input": os.path.basename(incsv),
         "input_rows": _count_rows(incsv),
+        "benchmark": base_cfg.get("benchmark", "hop-by-hop"),
         "rounds": base_cfg["rounds"],
         "mode": base_cfg["mode"],
         "samples": base_cfg["samples"],
@@ -294,12 +290,14 @@ def _rewrite(outcsv, rows):
     os.replace(tmp, outcsv)
 
 
-def process_file(incsv, outcsv, base_cfg, jobs, fresh=False):
+def process_file(incsv, outcsv, base_cfg, jobs, fresh=False, worker=_run_row):
     """All rows of one dataset CSV -> one results CSV. Returns (n_ok, n_err).
 
     Seeds restart at SEED + row index for every file, so each file's result
     set is identical whether it runs alone or inside a directory batch.
-    An existing results CSV is resumed (its keys are skipped) unless fresh."""
+    An existing results CSV is resumed (its keys are skipped) unless fresh.
+    worker maps one (row, cfg) job to a flat result tuple; other benchmark
+    architectures (run_nb1) reuse this pipeline by passing their own."""
     meta, mpath = _meta(incsv, base_cfg), _meta_path(outcsv)
     done = set()
     if not fresh and os.path.exists(outcsv):
@@ -352,12 +350,12 @@ def process_file(incsv, outcsv, base_cfg, jobs, fresh=False):
                 if (job[0]["DatasetID"], job[0]["PathID"]) not in done)
         if jobs == 1:                                 # in-process: no pool overhead, plain tracebacks
             for job in work:
-                emit(_run_row(job))
+                emit(worker(job))
         else:
             with ProcessPoolExecutor(max_workers=jobs) as ex:
                 pending = set()
                 for job in work:                      # bounded window: stream, never load the CSV whole
-                    pending.add(ex.submit(_run_row, job))
+                    pending.add(ex.submit(worker, job))
                     if len(pending) >= jobs * 4:
                         done, pending = wait(pending, return_when=FIRST_COMPLETED)
                         for fut in done:
@@ -372,7 +370,9 @@ def main():
         description="Batch network benchmarking over dataset CSVs, optionally with "
                     "link-level purified hops.")
     ap.add_argument("incsv", help="input *_datasets.csv file, or a directory of them")
-    ap.add_argument("outcsv", help="output results CSV, or a directory when the input is one")
+    ap.add_argument("--out-root", default=None,
+                    help="where the <topology>_<protocol> results directory is "
+                         "created (default: run_nb_res/ next to this script)")
     ap.add_argument("--purification", action="store_true",
                     help="purify every hop's link (standard repeated DEJMPS pumping)")
     ap.add_argument("--purification-rounds", type=int, default=None,
@@ -395,21 +395,25 @@ def main():
         rounds = 1 if args.purification_rounds is None else args.purification_rounds
         if not 1 <= rounds <= MAX_ROUNDS:
             ap.error(f"--purification-rounds must be in 1..{MAX_ROUNDS}, got {rounds}")
+        if args.protocol == "par":
+            ap.error("--purification pumps edges sequentially; use --protocol seq")
     mode = SEQUENTIAL if args.protocol == "seq" else PARALLEL
     jobs = args.jobs if args.jobs > 0 else (os.cpu_count() or 1)
 
-    base_cfg = {"rounds": rounds, "mode": mode, "samples": args.samples}
+    base_cfg = {"rounds": rounds, "mode": mode, "samples": args.samples,
+                "benchmark": "e2e-swap"}
+    tag = args.protocol + (f"-pur{rounds}" if rounds else "")
 
+    root = args.out_root or OUT_ROOT
     if os.path.isdir(args.incsv):
-        if os.path.isfile(args.outcsv):
-            ap.error(f"input is a directory, so output must be one too: {args.outcsv}")
-        pairs = [(f, os.path.join(args.outcsv, _result_name(f)))
-                 for f in _discover(args.incsv)]
-        if not pairs:
+        files = _discover(args.incsv)
+        if not files:
             ap.error(f"no dataset *.csv files in {args.incsv}")
-        os.makedirs(args.outcsv, exist_ok=True)
+        pairs = [(f, os.path.join(_out_dir(f, root, tag), _result_name(f)))
+                 for f in files]
     elif os.path.isfile(args.incsv):
-        pairs = [(args.incsv, args.outcsv)]
+        pairs = [(args.incsv,
+                  os.path.join(_out_dir(args.incsv, root, tag), _result_name(args.incsv)))]
     else:
         ap.error(f"input not found: {args.incsv}")
 

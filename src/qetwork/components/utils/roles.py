@@ -55,13 +55,19 @@ def _build_detector(timeline, cfg) -> TimeEnergyDetector:
 
 
 def _coherent_1q(cfg) -> np.ndarray | None:
-    """Residual rotation after every ideal 1q gate; angle 0 -> None (skip)."""
+    """Residual rotation after every ideal 1q gate; angle 0 -> None (skip).
+
+    Unitarity is checked HERE, once per node when the error is built, so apply_gate
+    need not re-check it on every application."""
     axis, angle = cfg["axis"], cfg["angle"]
     if axis not in ("x", "y", "z"):
         raise ValueError(f"coherent_1q axis must be x/y/z, got {axis!r}")
     if angle == 0:
         return None
-    return {"x": rx, "y": ry, "z": rz}[axis](angle)
+    U = {"x": rx, "y": ry, "z": rz}[axis](angle)
+    if not np.allclose(U.conj().T @ U, np.eye(2)):
+        raise ValueError(f"coherent_1q is not unitary for axis={axis!r}, angle={angle}")
+    return U
 
 
 def _coherent_2q(cfg) -> np.ndarray | None:
@@ -71,7 +77,10 @@ def _coherent_2q(cfg) -> np.ndarray | None:
     if theta == 0:
         return None
     e = np.exp(1j * theta / 2)
-    return np.diag([e.conjugate(), e, e, e.conjugate()])   # basis order |00>,|01>,|10>,|11>
+    U = np.diag([e.conjugate(), e, e, e.conjugate()])   # basis order |00>,|01>,|10>,|11>
+    if not np.allclose(U.conj().T @ U, np.eye(4)):      # validated once per node, not per gate
+        raise ValueError(f"coherent_2q is not unitary for zz_angle={theta}")
+    return U
 
 
 

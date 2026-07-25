@@ -20,6 +20,14 @@ class State:
             raise ValueError(f"State matrix must be square, got shape {m.shape}")
         if m.shape[0] != 2**n:
             raise ValueError(f"State matrix size {m.shape[0]} does not match number of qubits {n}")
+
+    def check_physical(self) -> None:
+        """The full density-operator invariants: Hermitian, unit trace, positive
+        semidefinite. Called ONLY where a matrix enters from outside CPTP evolution
+        (external initialization). Every state derived by unitary conjugation, a
+        Kraus channel, projective collapse, or a Kronecker product already satisfies
+        these by construction, so the hot path never re-checks them."""
+        m = self.matrix
         if not np.allclose(m, m.conj().T):
             raise ValueError("State matrix must be Hermitian")
         if not np.isclose(np.trace(m), 1):
