@@ -23,7 +23,7 @@ from pathlib import Path
 from qetwork.seed import make_rng
 from qetwork.topologies.topology_spec import TopologySpec
 
-N_DATASETS = 30
+N_DATASETS = 34
 
 # (lo, hi, scale); "log" = log-uniform for decade-spanning quantities
 RANGES = {
@@ -249,8 +249,3 @@ def generate_error_datasets(topology, *, n_datasets: int = N_DATASETS,
             print(f"{kind}: {len(rows)} paths x {n_datasets} datasets -> {out}")
     print(f"snapshots: {n_datasets} spec files in {snap_dir}")
     return outs
-
-
-if __name__ == "__main__":
-    here = Path(__file__).resolve().parent           # .../topologies/sim_path_gen
-    generate_error_datasets(here.parent / "grid10x10.json")

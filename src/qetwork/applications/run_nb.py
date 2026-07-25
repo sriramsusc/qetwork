@@ -2,14 +2,14 @@
 that feeds each CSV path to protocols.net_benchmarking and writes the outputs.
 
     python -m qetwork.applications.run_nb <in> [--out-root DIR] \\
-        [--purification] [--purification-rounds R] [--protocol seq|par] \\
+        [--purification] [--purification-rounds R] [--protocol seq|par|tad] \\
         [--samples N] [--jobs J] [--fresh]
 
 <in> is one *_datasets.csv or a directory of them (existing *_results.csv
 files are skipped as inputs). Every X.csv lands as X_results.csv inside a
 directory named <topology>_<protocol>: the topology is recovered from the
 input's filename (<name>_{prior,test,train_ds<k>}_datasets.csv -> <name>;
-any other stem is used as-is) and the protocol tag is seq|par, extended to
+any other stem is used as-is) and the protocol tag is seq|par|tad, extended to
 e.g. seq-pur2 when purifying so raw and purified runs never collide. The
 directory is created under --out-root (default: run_nb_res/ next to this
 script).
@@ -28,9 +28,10 @@ Flags:
                             kept pairs into the end-to-end pair
   --purification-rounds R   pump level, 1..5 consecutive successes (default 1);
                             only valid together with --purification
-  --protocol seq|par        EntanglementDistribution mode: sequential
-                            absorb->emit baton or parallel round-grid emission
-                            (par is invalid with --purification)
+  --protocol seq|par|tad    EntanglementDistribution mode: sequential
+                            absorb->emit baton, parallel round-grid emission, or
+                            tad time-aligned staggered starts (only seq is valid
+                            with --purification)
   --samples N               RB sequences per m (default 40; the detector readout
                             is one click per sequence, so raise it for clean fits)
   --jobs J                  worker processes (default 1; 0 = all cores). Every row
@@ -68,7 +69,7 @@ from qetwork.topologies.topology_spec import TopologySpec
 from qetwork.topologies.topos.topology_generator import (
     DEFAULT_NODE, DEFAULT_EDGE, DEFAULT_NETWORK, DEFAULT_DETECTOR,
 )
-from qetwork.protocols.e_dist_swap import SEQUENTIAL, PARALLEL
+from qetwork.protocols.e_dist_swap import SEQUENTIAL, PARALLEL, TAD
 from qetwork.protocols.net_benchmarking import NetworkBenchmark
 
 OUT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_nb_res")
@@ -378,7 +379,7 @@ def main():
     ap.add_argument("--purification-rounds", type=int, default=None,
                     help=f"pump level, 1..{MAX_ROUNDS} consecutive successes (default 1); "
                          f"requires --purification")
-    ap.add_argument("--protocol", choices=("seq", "par"), default="seq",
+    ap.add_argument("--protocol", choices=("seq", "par", "tad"), default="seq",
                     help="distribution protocol handed to the benchmark (reserved for the bounce)")
     ap.add_argument("--samples", type=int, default=40,
                     help="RB sequences per m (detector readout is one click/seq; raise for clean fits)")
@@ -395,9 +396,9 @@ def main():
         rounds = 1 if args.purification_rounds is None else args.purification_rounds
         if not 1 <= rounds <= MAX_ROUNDS:
             ap.error(f"--purification-rounds must be in 1..{MAX_ROUNDS}, got {rounds}")
-        if args.protocol == "par":
+        if args.protocol != "seq":
             ap.error("--purification pumps edges sequentially; use --protocol seq")
-    mode = SEQUENTIAL if args.protocol == "seq" else PARALLEL
+    mode = {"seq": SEQUENTIAL, "par": PARALLEL, "tad": TAD}[args.protocol]
     jobs = args.jobs if args.jobs > 0 else (os.cpu_count() or 1)
 
     base_cfg = {"rounds": rounds, "mode": mode, "samples": args.samples,

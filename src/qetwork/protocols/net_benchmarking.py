@@ -10,8 +10,9 @@ D->S. The data qubit only ever lives at the two ends; interior gate noise enters
 through the swaps, and the data qubit pays memory decoherence for every leg's
 full distribution latency.
 
-mode is EntanglementDistribution's: sequential (absorb->emit baton) or parallel
-(round-grid emission). purify_rounds >= 1 switches the distribution to
+mode is EntanglementDistribution's: sequential (absorb->emit baton), parallel
+(round-grid emission) or tad (expectation-aligned staggered starts, own-rtt
+retries). purify_rounds >= 1 switches the distribution to
 purify-then-swap: every edge is pumped to that level (LinkPumpSession, repeated
 DEJMPS), the kept pairs are swapped into the end-to-end pair; edges pump one
 after another (sequential mode only) and earlier kept pairs decohere while later
@@ -30,7 +31,7 @@ import numpy as np
 from qetwork.operations.gates import random_clifford, X, apply_gate
 from qetwork.events.priority import PROTOCOL
 from qetwork.protocols.errors import ProtocolError
-from qetwork.protocols.e_dist_swap import EntanglementDistribution, SEQUENTIAL, PARALLEL
+from qetwork.protocols.e_dist_swap import EntanglementDistribution, SEQUENTIAL, PARALLEL, TAD
 from qetwork.protocols.link_pump import LinkPumpSession
 
 
@@ -53,8 +54,8 @@ class NetworkBenchmark:
 
     def __init__(self, net, path=None, m_min=1, m_max=8, n_samples=40, n_shots=0,
                  purify_rounds=0, calibrate=True, mode=SEQUENTIAL):
-        if mode not in (SEQUENTIAL, PARALLEL):
-            raise ValueError(f"mode must be {SEQUENTIAL!r} or {PARALLEL!r}, got {mode!r}")
+        if mode not in (SEQUENTIAL, PARALLEL, TAD):
+            raise ValueError(f"mode must be {SEQUENTIAL!r}, {PARALLEL!r} or {TAD!r}, got {mode!r}")
         self.mode = mode
         self.net = net
         self.tl = net.timeline
@@ -67,9 +68,9 @@ class NetworkBenchmark:
         self.m_min, self.m_max, self.n_samples, self.n_shots = m_min, m_max, n_samples, n_shots
         if not isinstance(purify_rounds, int) or isinstance(purify_rounds, bool) or purify_rounds < 0:
             raise ValueError(f"purify_rounds must be an int >= 0, got {purify_rounds!r}")
-        if purify_rounds >= 1 and mode == PARALLEL:
+        if purify_rounds >= 1 and mode != SEQUENTIAL:
             raise ValueError("purified distribution pumps edges sequentially; "
-                             "parallel mode is not supported with it")
+                             f"only {SEQUENTIAL!r} mode supports it, got {mode!r}")
         self.purify_rounds = purify_rounds
         self.calibrate = calibrate
         for end in (self.nodes[0], self.nodes[-1]):

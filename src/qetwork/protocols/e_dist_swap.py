@@ -1,7 +1,7 @@
 """Entanglement distribution over a linear path: per-node agents, message-passing only.
 
 Design: docs/e_distribution_ir.md. One RepeaterProtocol agent per node on the path.
-Both modes share the same agent; they differ only in *when* a node first fires its
+All modes share the same agent; they differ only in *when* a node first fires its
 downstream link and in the retry cadence:
 
   * sequential -- only the source fires at t=0; each node fires its downstream link when
@@ -9,8 +9,13 @@ downstream link and in the retry cadence:
     knows a link failed (one round trip later).
   * parallel   -- every emitter fires at t=0 (round 1); failed links retry together on a
     shared round grid (the slowest edge's round trip) until all links are up.
+  * tad        -- time-aligned distribution: every emitter fires once at a precomputed
+    offset chosen so all links' EXPECTED completions coincide (offset = max E[T] - own
+    E[T], with E[T] = rtt + (1/p - 1)(rtt + 1) and p the outgoing qfiber's survival);
+    failed links retry on their own round trip, like sequential. Fast links start late
+    so their pairs idle less in memory before the swaps.
 
-Swaps are as-ready in both modes: an interior swaps the instant its own two links are up.
+Swaps are as-ready in all modes: an interior swaps the instant its own two links are up.
 Corrections defer to the destination as one Pauli frame (XOR of the BSM bits). The
 deliverable is a bare end-to-end Bell pair held in the source and destination link
 memories. Agents drive the RepeaterNode verbs (attempt_link / on_absorb / bsm / correct)
@@ -26,6 +31,7 @@ from qetwork.events.priority import PROTOCOL
 
 SEQUENTIAL = "sequential"
 PARALLEL   = "parallel"
+TAD        = "tad"            # time-aligned distribution: expectation-staggered starts
 
 LINK_ACK    = "link_ack"      # absorber -> emitter: "your downstream half landed"
 SWAP_RESULT = "swap_result"   # interior -> destination: BSM byproduct bits (m1, m2)
@@ -39,6 +45,14 @@ class DistributionResult:
     latency: int                    # ps from t=0 to the destination's correction
     attempts: dict[str, int]        # emitter node_id -> number of link attempts it made
     rounds: int                     # max attempts over all edges (parallel: synchronized rounds run)
+    offsets: dict[str, int]         # emitter node_id -> scheduled start delay in ps (all 0 outside tad)
+
+
+def expected_completion(rtt: int, p: float) -> float:
+    """Expected emitter-side completion of one link (herald out + ACK back): the first
+    attempt costs rtt; each of the expected 1/p - 1 failures costs a timeout (rtt + 1)."""
+    return rtt + (1 / p - 1) * (rtt + 1)
+
 
 def validate_path(net, path) -> list[str]:
     """Shared end-to-end path validation: real nodes, real edges, no revisits,
@@ -77,6 +91,7 @@ class RepeaterProtocol:
 
         self.rtt = self._round_trip() if down_id is not None else None
         self.round_period: int | None = None   # parallel retry grid; set by the coordinator
+        self.start_offset = 0                  # tad first-shot delay (ps); set by the coordinator
         self.attempts = 0
 
         self.up_ready = False
@@ -113,9 +128,10 @@ class RepeaterProtocol:
     def attempt_downstream(self) -> None:
         """Emit one pair on the downstream edge and arm the retry check.
 
-        The retry cadence is the whole sequential/parallel difference: sequential re-fires
-        as soon as it knows it failed (rtt+1); parallel snaps every retry to the shared
-        round grid (round_period) so all failed edges re-attempt in lockstep.
+        The retry cadence is where parallel differs: it snaps every retry to the shared
+        round grid (round_period) so all failed edges re-attempt in lockstep. Sequential
+        and tad both re-fire as soon as the emitter knows it failed (own rtt+1); tad's
+        whole mode difference lives in the start() offsets, not here.
         """
         self.node.link_mems[self.down_id].reset()       # clear a stale idler on retry (no-op if empty)
         self.down_gen += 1
@@ -194,10 +210,12 @@ class RepeaterProtocol:
 class EntanglementDistribution:
     """Builds one agent per path node, kicks off, and collects the delivered pair.
 
-    Sequential vs parallel is one knob. Sequential fires only the source at t=0 and lets
-    the absorb->emit baton walk the chain, retrying each edge on its own round trip.
-    Parallel fires every emitter at t=0 and retries failed links together on a shared round
-    grid until all are up. Swaps are as-ready in both.
+    Mode is one knob. Sequential fires only the source at t=0 and lets the absorb->emit
+    baton walk the chain, retrying each edge on its own round trip. Parallel fires every
+    emitter at t=0 and retries failed links together on a shared round grid until all are
+    up. Tad fires every emitter once at an expectation-aligned offset (slowest expected
+    link first, offset 0) and retries each edge on its own round trip, aiming for all
+    links to complete together. Swaps are as-ready in all modes.
     """
 
     def __init__(self, net, path=None, mode=SEQUENTIAL):
@@ -205,19 +223,8 @@ class EntanglementDistribution:
         self.timeline = net.timeline
         self.path = validate_path(net, path if path is not None else net.path())
         self.mode = mode
-        if mode not in (SEQUENTIAL, PARALLEL):
-            raise ValueError(f"mode must be {SEQUENTIAL!r} or {PARALLEL!r}, got {mode!r}")
-        missing = [nid for nid in self.path if nid not in net.nodes]
-        if missing:
-            raise ValueError(f"path references unknown nodes {missing}")
-        if len(set(self.path)) != len(self.path):
-            raise ValueError(f"path revisits a node: {self.path}")
-        for a, b in zip(self.path, self.path[1:]):
-            if not net.graph.has_edge(a, b):
-                raise ValueError(f"path hop {a!r}->{b!r} has no quantum edge")
-        if self.path[0] != net.source_id or self.path[-1] != net.dest_id:
-            raise ValueError(f"path endpoints ({self.path[0]!r}, {self.path[-1]!r}) do not match "
-                             f"network roles ({net.source_id!r}, {net.dest_id!r})")
+        if mode not in (SEQUENTIAL, PARALLEL, TAD):
+            raise ValueError(f"mode must be {SEQUENTIAL!r}, {PARALLEL!r} or {TAD!r}, got {mode!r}")
 
         self.num_edges = len(self.path) - 1
         self.result: DistributionResult | None = None
@@ -239,17 +246,36 @@ class EntanglementDistribution:
         # in before the next round fires) + wire each agent's hook/handlers
         rtts = [a.rtt for a in self.agents.values() if a.rtt is not None]
         self.round_period = (max(rtts) + 1) if rtts else 0
+        if self.mode == TAD:
+            # expectation alignment: offset each edge so all E[T] land together; the
+            # slowest expected edge anchors at 0. p is read, not recomputed -- the same
+            # qfiber the rtt came from, so any future loss-model change flows through.
+            ets: dict[str, float] = {}
+            for nid, a in self.agents.items():
+                if a.down_id is None:
+                    continue
+                p = a.node.ports[f"q:{a.down_id}"].qfiber.survival
+                if not 0.0 < p <= 1.0:
+                    raise ValueError(f"edge {nid!r}->{a.down_id!r} has survival {p!r}; "
+                                     f"expected a probability in (0, 1]")
+                ets[nid] = expected_completion(a.rtt, p)
+            et_max = max(ets.values())
+            for nid, et in ets.items():
+                self.agents[nid].start_offset = round(et_max - et)
         for a in self.agents.values():
             if self.mode == PARALLEL:
                 a.round_period = self.round_period
             a.install()
 
     def start(self) -> None:
-        """Kickoff: sequential fires only the source; parallel fires every emitter (round 1)."""
+        """Kickoff: sequential fires only the source; parallel and tad fire every emitter,
+        tad each at its expectation-aligned offset (0 outside tad)."""
         starters = [self.path[0]] if self.mode == SEQUENTIAL else self.path[:-1]
         now = self.timeline.now()
         for nid in starters:
-            self.timeline.schedule(self.agents[nid].attempt_downstream, at=now, priority=PROTOCOL)
+            agent = self.agents[nid]
+            self.timeline.schedule(agent.attempt_downstream,
+                                   at=now + agent.start_offset, priority=PROTOCOL)
 
     def run(self) -> DistributionResult | None:
         self.start()
@@ -273,6 +299,8 @@ class EntanglementDistribution:
             latency=self.timeline.now(),
             attempts=attempts,
             rounds=max(attempts.values(), default=0),
+            offsets={nid: a.start_offset for nid, a in self.agents.items()
+                     if a.down_id is not None},
         )
 
     def reset(self) -> None:
