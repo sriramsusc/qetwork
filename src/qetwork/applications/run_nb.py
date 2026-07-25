@@ -1,12 +1,13 @@
 """Batch network benchmarking over error-stamped dataset CSVs: a thin driver
 that feeds each CSV path to protocols.net_benchmarking and writes the outputs.
 
-    python -m qetwork.applications.run_nb <in> [--out-root DIR] \\
+    python -m qetwork.applications.run_nb [in] [--out-root DIR] \\
         [--purification] [--purification-rounds R] [--protocol seq|par|tad] \\
         [--samples N] [--jobs J] [--fresh]
 
-<in> is one *_datasets.csv or a directory of them (existing *_results.csv
-files are skipped as inputs). Every X.csv lands as X_results.csv inside a
+[in] is one *_datasets.csv or a directory of them (existing *_results.csv
+files are skipped as inputs); omit it to read every CSV from the package's
+input_dir/ directory (../input_dir next to this script). Every X.csv lands as X_results.csv inside a
 directory named <topology>_<protocol>: the topology is recovered from the
 input's filename (<name>_{prior,test,train_ds<k>}_datasets.csv -> <name>;
 any other stem is used as-is) and the protocol tag is seq|par|tad, extended to
@@ -73,6 +74,8 @@ from qetwork.protocols.e_dist_swap import SEQUENTIAL, PARALLEL, TAD
 from qetwork.protocols.net_benchmarking import NetworkBenchmark
 
 OUT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_nb_res")
+INPUT_DIR = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "input_dir"))
 
 M_MIN, M_MAX = 1, 8            # bounce range of the RB fit
 SEED = 1                       # base seed; row i runs with SEED + i
@@ -370,7 +373,9 @@ def main():
     ap = argparse.ArgumentParser(
         description="Batch network benchmarking over dataset CSVs, optionally with "
                     "link-level purified hops.")
-    ap.add_argument("incsv", help="input *_datasets.csv file, or a directory of them")
+    ap.add_argument("incsv", nargs="?", default=None,
+                    help="input *_datasets.csv file, or a directory of them "
+                         "(default: the input_dir/ package directory)")
     ap.add_argument("--out-root", default=None,
                     help="where the <topology>_<protocol> results directory is "
                          "created (default: run_nb_res/ next to this script)")
@@ -406,17 +411,18 @@ def main():
     tag = args.protocol + (f"-pur{rounds}" if rounds else "")
 
     root = args.out_root or OUT_ROOT
-    if os.path.isdir(args.incsv):
-        files = _discover(args.incsv)
+    incsv = args.incsv if args.incsv is not None else INPUT_DIR
+    if os.path.isdir(incsv):
+        files = _discover(incsv)
         if not files:
-            ap.error(f"no dataset *.csv files in {args.incsv}")
+            ap.error(f"no dataset *.csv files in {incsv}")
         pairs = [(f, os.path.join(_out_dir(f, root, tag), _result_name(f)))
                  for f in files]
-    elif os.path.isfile(args.incsv):
-        pairs = [(args.incsv,
-                  os.path.join(_out_dir(args.incsv, root, tag), _result_name(args.incsv)))]
+    elif os.path.isfile(incsv):
+        pairs = [(incsv,
+                  os.path.join(_out_dir(incsv, root, tag), _result_name(incsv)))]
     else:
-        ap.error(f"input not found: {args.incsv}")
+        ap.error(f"input not found: {incsv}")
 
     bad = []
     for i, (incsv, outcsv) in enumerate(pairs):
