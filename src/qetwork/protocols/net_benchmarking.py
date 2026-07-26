@@ -12,11 +12,12 @@ full distribution latency.
 
 mode is EntanglementDistribution's: sequential (absorb->emit baton), parallel
 (round-grid emission) or tad (expectation-aligned staggered starts, own-rtt
-retries). purify_rounds >= 1 switches the distribution to
-purify-then-swap: every edge is pumped to that level (LinkPumpSession, repeated
-DEJMPS), the kept pairs are swapped into the end-to-end pair; edges pump one
-after another (sequential mode only) and earlier kept pairs decohere while later
-edges pump -- that cost is real.
+retries). purify_rounds >= 1 switches the distribution to purify-then-swap
+(PurifiedDistribution): every edge is pumped to that level (repeated DEJMPS) and
+the kept pairs are swapped into the end-to-end pair. mode schedules only the pump
+STARTS -- sequential chains edge after edge (earlier kept pairs decohere while
+later edges pump), parallel starts every edge at t=0, tad staggers the starts so
+edges finish pumping together. All modes barrier-swap once every edge is done.
 
 Exact readout + perfect prep => no SPAM => the survival fits b_m = f^m and
 F_path = (1 + f) / 2; with the detector readout SPAM lands in A, not f.
@@ -32,7 +33,7 @@ from qetwork.operations.gates import random_clifford, X, apply_gate
 from qetwork.events.priority import PROTOCOL
 from qetwork.protocols.errors import ProtocolError
 from qetwork.protocols.e_dist_swap import EntanglementDistribution, SEQUENTIAL, PARALLEL, TAD
-from qetwork.protocols.link_pump import LinkPumpSession
+from qetwork.protocols.link_pump import PurifiedDistribution
 
 
 @dataclass(slots=True)
@@ -68,19 +69,20 @@ class NetworkBenchmark:
         self.m_min, self.m_max, self.n_samples, self.n_shots = m_min, m_max, n_samples, n_shots
         if not isinstance(purify_rounds, int) or isinstance(purify_rounds, bool) or purify_rounds < 0:
             raise ValueError(f"purify_rounds must be an int >= 0, got {purify_rounds!r}")
-        if purify_rounds >= 1 and mode != SEQUENTIAL:
-            raise ValueError("purified distribution pumps edges sequentially; "
-                             f"only {SEQUENTIAL!r} mode supports it, got {mode!r}")
         self.purify_rounds = purify_rounds
         self.calibrate = calibrate
         for end in (self.nodes[0], self.nodes[-1]):
             if not end.unbound_mems():
                 raise ValueError(f"path endpoint {end.node_id!r} needs a spare (unbound) memory "
                                  f"to park the data qubit at the turnaround")
-        # pump sessions replace the raw agents' hooks, so the two transports are
-        # mutually exclusive per benchmark instance
+        # raw vs purified transport are mutually exclusive per benchmark instance;
+        # each is built once and reused via reset() across every leg (tad offsets,
+        # computed in PurifiedDistribution.__init__, are static over the path).
         self.dist = (EntanglementDistribution(net, self.path, mode=mode)
                      if purify_rounds < 1 else None)
+        self.pdist = (PurifiedDistribution(net, self.path, purify_rounds,
+                                           calibrate=calibrate, mode=mode)
+                      if purify_rounds >= 1 else None)
         self.s_half_id = self.path[1]     # source's pair half lives in link_mems[here]
         self.d_half_id = self.path[-2]    # destination's half
 
@@ -89,9 +91,6 @@ class NetworkBenchmark:
     def _cdelay(self, A, B):
         cf = A.cfibers[B.node_id]
         return cf.delay + cf.latency
-
-    def _noop(self):
-        pass
 
     def _do_correct(self, B, mem, m1, m2):
         B.correct(mem, m1, m2)
@@ -124,7 +123,14 @@ class NetworkBenchmark:
         a_half_id = self.s_half_id if A is self.nodes[0] else self.d_half_id
         b_half_id = self.d_half_id if B is self.nodes[-1] else self.s_half_id
         if self.purify_rounds >= 1:
-            data, pair_a, pair_b = self._purified_pair(A, B, a_half_id, b_half_id, data)
+            kept_a = A.ensure_memory(f"purify:kept:{a_half_id}")
+            if data is A.link_mems[a_half_id] or data is kept_a:   # pdist.run() recycles both
+                data = self._park(A, data)
+            self.pdist.reset()
+            if self.pdist.run() is None:
+                raise ProtocolError("purified distribution starved before delivering")
+            pair_a = A.memory(f"purify:kept:{a_half_id}")          # symmetric pair; A picks its half
+            pair_b = B.memory(f"purify:kept:{b_half_id}")
         else:
             if data is A.link_mems[a_half_id]:    # dist.reset() would wipe the data qubit
                 data = self._park(A, data)
@@ -138,36 +144,6 @@ class NetworkBenchmark:
                     priority=PROTOCOL)
         tl.run()                                  # bits fly, correction settles pair_b
         return pair_b
-
-    def _purified_pair(self, A, B, a_half_id, b_half_id, data):
-        """Purify-then-swap: pump every edge to purify_rounds kept pairs, swap the
-        kept pairs into one end-to-end pair (single XOR Pauli frame, corrected at
-        the path destination). Returns (data, A's half, B's half); `data` moves to
-        a spare first when it occupies a slot the pumping would recycle."""
-        tl = self.tl
-        kept_a = A.ensure_memory(f"purify:kept:{a_half_id}")
-        if data is A.link_mems[a_half_id] or data is kept_a:
-            data = self._park(A, data)
-        for u, v in zip(self.path, self.path[1:]):       # pump edge by edge
-            LinkPumpSession(self.net, u, v, rounds=self.purify_rounds,
-                            calibrate=self.calibrate).run()
-        dest = self.nodes[-1]
-        kept_dest = dest.memory(f"purify:kept:{self.d_half_id}")
-        if self.K > 2:                                   # swap cascade + one frame
-            acc1 = acc2 = 0
-            latest = tl.now()
-            for i in range(1, self.K - 1):
-                node = self.nodes[i]
-                m1, m2 = node.bsm(node.memory(f"purify:kept:{self.path[i - 1]}"),
-                                  node.memory(f"purify:kept:{self.path[i + 1]}"))
-                acc1 ^= m1
-                acc2 ^= m2
-                latest = max(latest, tl.now() + node.bsm_duration + self._cdelay(node, dest))
-            tl.schedule(self._do_correct, dest, kept_dest, acc1, acc2,
-                        at=latest, priority=PROTOCOL)
-            tl.schedule(self._noop, at=latest + dest.correct_duration, priority=PROTOCOL)
-            tl.run()                                     # frame lands, pair is standard
-        return data, A.memory(f"purify:kept:{a_half_id}"), B.memory(f"purify:kept:{b_half_id}")
 
     # --- one RB sequence of m bounces ---
 

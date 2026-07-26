@@ -24,15 +24,15 @@ module for the physics), and writes ONE output CSV row per path:
     DatasetID, PathID, PathString, path_fidelity, avg_time_us
 
 Flags:
-  --purification            purify-then-swap distribution: pump every edge's
-                            link (LinkPumpSession, repeated DEJMPS), swap the
-                            kept pairs into the end-to-end pair
+  --purification            purify-then-swap distribution (PurifiedDistribution):
+                            pump every edge's link (repeated DEJMPS), swap the
+                            kept pairs into the end-to-end pair. Works with every
+                            --protocol (the mode schedules the pump starts)
   --purification-rounds R   pump level, 1..5 consecutive successes (default 1);
                             only valid together with --purification
-  --protocol seq|par|tad    EntanglementDistribution mode: sequential
-                            absorb->emit baton, parallel round-grid emission, or
-                            tad time-aligned staggered starts (only seq is valid
-                            with --purification)
+  --protocol seq|par|tad    distribution mode: sequential absorb->emit baton (or
+                            chained edge pumps), parallel emission at t=0, or tad
+                            time-aligned staggered starts
   --samples N               RB sequences per m (default 40; the detector readout
                             is one click per sequence, so raise it for clean fits)
   --jobs J                  worker processes (default 1; 0 = all cores). Every row
@@ -401,8 +401,6 @@ def main():
         rounds = 1 if args.purification_rounds is None else args.purification_rounds
         if not 1 <= rounds <= MAX_ROUNDS:
             ap.error(f"--purification-rounds must be in 1..{MAX_ROUNDS}, got {rounds}")
-        if args.protocol != "seq":
-            ap.error("--purification pumps edges sequentially; use --protocol seq")
     mode = {"seq": SEQUENTIAL, "par": PARALLEL, "tad": TAD}[args.protocol]
     jobs = args.jobs if args.jobs > 0 else (os.cpu_count() or 1)
 

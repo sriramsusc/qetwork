@@ -36,7 +36,10 @@ from dataclasses import dataclass
 
 from qetwork.events.priority import PROTOCOL
 from qetwork.protocols.errors import ProtocolError
-from qetwork.protocols.e_dist_swap import LinkGeneration
+from qetwork.protocols.e_dist_swap import (
+    LinkGeneration, validate_path, expected_completion,
+    SEQUENTIAL, PARALLEL, TAD,
+)
 
 PURIFY_BIT = "purify_bit"          # absorber -> emitter: outcome bit + (epoch, level) stamps
 PURIFY_VERDICT = "purify_verdict"  # emitter -> absorber: keep/discard + (epoch, level) echo
@@ -271,3 +274,183 @@ class LinkPumpSession:
         self.stats.emission_attempts = self.linkgen.attempts
         if self.on_done is not None:
             self.on_done()
+
+
+# --- purified end-to-end distribution: many sessions on one path, scheduled by mode ---
+
+def _noop(*_args, **_kwargs) -> None:
+    """A do-nothing event: advances the virtual clock to a target instant."""
+
+
+def _dejmps_step(fidelity: float) -> tuple[float, float]:
+    """One DEJMPS round on a Werner-parameterized Bell-diagonal input of the given
+    Phi+ fidelity: (keep probability, kept-pair fidelity). Standard Deutsch et al.
+    recurrence -- an APPROXIMATION to purify_local's exact circuit, used only to size
+    tad start offsets and validated against empirical keep rates, never a fidelity claim."""
+    a = fidelity
+    b = c = d = (1.0 - fidelity) / 3.0
+    p_keep = (a + d) ** 2 + (b + c) ** 2
+    f_new = (a * a + d * d) / p_keep if p_keep > 0 else 0.0
+    return p_keep, f_new
+
+
+def expected_pump_pairs(rounds: int, f0: float) -> float:
+    """Expected heralded pairs to build a kept pair to `rounds` consecutive DEJMPS
+    successes from raw fidelity f0. A failed round discards the kept pair (back to a
+    fresh kept-maker), so this is the restart-to-zero recurrence
+        E_R = 0;  E_l = 1 + q_l E_{l+1} + (1-q_l)(1 + E_0)
+    solved by an affine backward pass (E_l = a_l + b_l E_0). +1 counts the kept-maker."""
+    qs = []
+    f = f0
+    for _ in range(rounds):
+        q, f = _dejmps_step(f)
+        qs.append(q)
+    a_coef, b_coef = 0.0, 0.0                        # E_R = 0
+    for q in reversed(qs):                           # l = R-1 .. 0
+        a_coef = (2.0 - q) + q * a_coef
+        b_coef = (1.0 - q) + q * b_coef
+    e0 = a_coef / (1.0 - b_coef)
+    return 1.0 + e0
+
+
+def expected_pump_completion(rtt: int, p_link: float, rounds: int, f0: float) -> float:
+    """Expected wall-time to pump one edge to `rounds`: expected heralded pairs times
+    the expected time per heralded pair (the raw-link statistic). Ignores per-round
+    classical/gate overhead -- second-order when pair generation dominates."""
+    return expected_pump_pairs(rounds, f0) * expected_completion(rtt, p_link)
+
+
+@dataclass(slots=True)
+class PurifiedResult:
+    """The delivered purified end-to-end pair and per-edge pump effort."""
+    source_key: int
+    dest_key: int
+    latency: int                   # ps from t=0 to the destination's frame correction
+    edge_stats: dict               # emitter node_id -> EdgeStats
+    offsets: dict                  # emitter node_id -> scheduled start delay in ps (0 outside tad)
+
+
+class PurifiedDistribution:
+    """Purify-then-swap end-to-end distribution: one LinkPumpSession per path edge,
+    pumped to `rounds` consecutive DEJMPS successes, then swapped into one end-to-end
+    pair with a single XOR Pauli frame corrected at the path destination. Delivers the
+    pair in the source's `purify:kept:{next}` and destination's `purify:kept:{prev}` slots.
+
+    Mode schedules only the pump STARTS -- every session free-runs its own arm cadence:
+      * sequential -- edge k+1 starts when edge k finishes (chained on_done); reproduces
+        the historical edge-by-edge blocking loop.
+      * parallel   -- every edge starts at t=0 and pumps concurrently on the shared
+        timeline; the barrier is the slowest edge, not the sum of all edges.
+      * tad        -- every edge starts at an expectation-aligned offset (slowest expected
+        edge at 0) so edges finish pumping together, minimizing kept-pair idle before swap.
+
+    Swaps are barrier-synchronized in all modes: every edge done, then one swap cascade.
+    """
+
+    def __init__(self, net, path, rounds, calibrate=True, mode=SEQUENTIAL):
+        if not isinstance(rounds, int) or isinstance(rounds, bool) or rounds < 1:
+            raise ValueError(f"rounds must be an int >= 1, got {rounds!r}")
+        if mode not in (SEQUENTIAL, PARALLEL, TAD):
+            raise ValueError(f"mode must be {SEQUENTIAL!r}, {PARALLEL!r} or {TAD!r}, got {mode!r}")
+        self.net = net
+        self.timeline = net.timeline
+        self.path = validate_path(net, path)
+        self.rounds = rounds
+        self.calibrate = calibrate
+        self.mode = mode
+        self.num_edges = len(self.path) - 1
+        self.edges = list(zip(self.path, self.path[1:]))     # (emitter, absorber) per hop
+        self.result: PurifiedResult | None = None
+
+        # static tad offsets: align expected pump completions; slowest expected edge anchors
+        # at 0. p and rtt are read from the same qfiber/cfiber the session would use.
+        self.offsets = {u: 0 for u, _ in self.edges}
+        if mode == TAD:
+            ets = {}
+            for u, v in self.edges:
+                A = net.nodes[u]
+                cf = A.cfibers[v]
+                rtt = A.ports[f"q:{v}"].qfiber.delay + cf.delay + cf.latency
+                p_link = A.ports[f"q:{v}"].qfiber.survival
+                if not 0.0 < p_link <= 1.0:
+                    raise ValueError(f"edge {u!r}->{v!r} has survival {p_link!r}; "
+                                     f"expected a probability in (0, 1]")
+                f0 = (1.0 + 3.0 * A.source.visibility) / 4.0
+                ets[u] = expected_pump_completion(rtt, p_link, rounds, f0)
+            et_max = max(ets.values())
+            self.offsets = {u: round(et_max - e) for u, e in ets.items()}
+
+    def _cdelay(self, A, B) -> int:
+        cf = A.cfibers[B.node_id]
+        return cf.delay + cf.latency
+
+    def run(self) -> PurifiedResult | None:
+        tl = self.timeline
+        now0 = tl.now()
+        order = [u for u, _ in self.edges]
+        sessions = {u: LinkPumpSession(self.net, u, v, rounds=self.rounds,
+                                       calibrate=self.calibrate)
+                    for u, v in self.edges}
+        pending = set(order)
+
+        def _make_on_done(u, idx):
+            def _done():
+                pending.discard(u)
+                if self.mode == SEQUENTIAL and idx + 1 < len(order):
+                    tl.schedule(sessions[order[idx + 1]].start, at=tl.now(), priority=PROTOCOL)
+            return _done
+
+        for idx, u in enumerate(order):
+            sessions[u].on_done = _make_on_done(u, idx)
+            sessions[u].install()
+
+        if self.mode == SEQUENTIAL:                          # only the first edge starts now
+            tl.schedule(sessions[order[0]].start, at=now0, priority=PROTOCOL)
+        else:                                                # parallel/tad: each at its offset
+            for u in order:
+                tl.schedule(sessions[u].start, at=now0 + self.offsets[u], priority=PROTOCOL)
+
+        while pending and tl.step():                         # pump phase -> barrier
+            pass
+        if pending:
+            for s in sessions.values():
+                s.uninstall()
+            raise ProtocolError(f"purified distribution {self.path}: "
+                                f"timeline drained before all edges pumped")
+
+        # swap cascade + one Pauli frame at the path destination (barrier-synchronized)
+        dest = self.net.nodes[self.path[-1]]
+        if self.num_edges > 1:
+            acc1 = acc2 = 0
+            latest = tl.now()
+            for i in range(1, self.num_edges):
+                node = self.net.nodes[self.path[i]]
+                m1, m2 = node.bsm(node.memory(f"purify:kept:{self.path[i - 1]}"),
+                                  node.memory(f"purify:kept:{self.path[i + 1]}"))
+                acc1 ^= m1
+                acc2 ^= m2
+                latest = max(latest, tl.now() + node.bsm_duration + self._cdelay(node, dest))
+            tl.schedule(dest.correct, dest.memory(f"purify:kept:{self.path[-2]}"),
+                        acc1, acc2, at=latest, priority=PROTOCOL)
+            tl.schedule(_noop, at=latest + dest.correct_duration, priority=PROTOCOL)
+        while tl.step():                                     # flush cascade + stale timeouts
+            pass
+        for s in sessions.values():
+            s.uninstall()
+
+        src_half = self.net.nodes[self.path[0]].memory(f"purify:kept:{self.path[1]}")
+        dst_half = self.net.nodes[self.path[-1]].memory(f"purify:kept:{self.path[-2]}")
+        src_half.decohere()                                  # settle the endpoint halves to now
+        dst_half.decohere()                                  # (dst already settled by correct())
+        self.result = PurifiedResult(
+            source_key=src_half.key,
+            dest_key=dst_half.key,
+            latency=tl.now(),
+            edge_stats={u: s.stats for u, s in sessions.items()},
+            offsets=dict(self.offsets),
+        )
+        return self.result
+
+    def reset(self) -> None:
+        """Re-arm for another delivery over the same path (offsets are static)."""
+        self.result = None
