@@ -1,6 +1,8 @@
 """Measurements: Projective, Bell, SNSPD detection and mem qubit collapse"""
 
-import numpy as np 
+import numpy as np
+
+from functools import lru_cache
 
 from qetwork.operations.core import _embed, _eigenprojectors
 from qetwork.operations.partial_trace import partial_trace
@@ -46,10 +48,26 @@ def _select(probs: list[float], sample: float) -> int:
     return max(range(len(clamped)), key=lambda i: clamped[i])
 
 
-def _measure(rho: np.ndarray, idx: int, projectors: list[np.ndarray], sample: float):
+def _embedded_projectors(basis, idx: int, n: int):
+    """(outcomes, embedded projectors) for a measurement basis at `idx` in n qubits.
+
+    A string basis (the RB/readout path) is cached on (basis, idx, n); an ndarray
+    basis, being unhashable, is embedded fresh. Embedded projectors are SHARED and
+    read-only; never mutate them in place."""
+    if isinstance(basis, str):
+        return _embedded_projectors_cached(basis, idx, n)
+    outcomes, projectors = _eigenprojectors(_observable(basis))
+    return outcomes, [_embed(P, (idx,), n) for P in projectors]
+
+
+@lru_cache(maxsize=None)
+def _embedded_projectors_cached(basis: str, idx: int, n: int):
+    outcomes, projectors = _eigenprojectors(_observable(basis))
+    return outcomes, tuple(_embed(P, (idx,), n) for P in projectors)
+
+
+def _measure(rho: np.ndarray, embedded, sample: float):
     # CITE born-collapse | ...
-    n = rho.shape[0].bit_length() - 1
-    embedded = [_embed(P, (idx,), n) for P in projectors]
     probs = [np.trace(E @ rho).real for E in embedded]
     m = _select(probs, sample)
     pm = probs[m]
@@ -63,9 +81,9 @@ def measure(tracker, key: int, sample: float, basis: np.ndarray | str = "Z"):
     state = tracker.get(key)
     joint_keys = state.keys
     idx = joint_keys.index(key)
-    outcomes, projectors = _eigenprojectors(_observable(basis))
-    m, rho2 = _measure(state.matrix, idx, projectors, sample)
     n = len(joint_keys)
+    outcomes, embedded = _embedded_projectors(basis, idx, n)
+    m, rho2 = _measure(state.matrix, embedded, sample)
     if n == 1:
         tracker.set(joint_keys, rho2)
     else:

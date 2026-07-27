@@ -49,7 +49,7 @@ def dephase(tracker, keys: tuple[int, ...], factor: float) -> None:
     state = tracker.get(keys[0])
     joint = state.keys
     idx = joint.index(keys[0])
-    Z_i = _embed(Z, (idx, ), len(joint))
+    Z_i = _embedded_Z(idx, len(joint))
     lam = (1 - factor) / 2
     rho = state.matrix
     tracker.set(joint, (1-lam) * rho + lam * (Z_i @ rho @ Z_i))
@@ -97,6 +97,22 @@ def _depol_kraus(k: int, p: float):
     return kraus
 
 
+@lru_cache(maxsize=None)
+def _embedded_paulis(k: int, indices: tuple[int, ...], n: int):
+    """The k-qubit Pauli basis (identity-first) embedded at `indices` in n qubits.
+
+    Keyed only on (k, indices, n) -- all p-INDEPENDENT -- so the cache stays a small
+    constant no matter how many distinct p a run touches. The returned tuple is
+    SHARED and read-only; never mutate its arrays in place."""
+    return tuple(_embed(P, indices, n) for P in _paulis(k))
+
+
+@lru_cache(maxsize=None)
+def _embedded_Z(idx: int, n: int):
+    """Pauli Z embedded at `idx` in n qubits (a constant; SHARED, read-only)."""
+    return _embed(Z, (idx,), n)
+
+
 def depolarize(tracker, keys: tuple[int, ...], p: float) -> None:
     """Apply the joint k-qubit depolarizing channel to the qubits at `keys`."""
     keys = tuple(keys)
@@ -112,10 +128,19 @@ def depolarize(tracker, keys: tuple[int, ...], p: float) -> None:
     if p == 0:
         return
 
+    _depol_kraus(len(keys), p)          # keep the one-time trace-preservation guard (cached; raises on a bad set)
     joint = tracker.combine(keys)
     indices = tuple(joint.index(key) for key in keys)
     rho = tracker.get(keys[0]).matrix
-    tracker.set(joint, _apply_kraus(rho, _depol_kraus(len(keys), p), indices))
+    k = len(keys)
+    emb = _embedded_paulis(k, indices, len(joint))
+    w = p / (4**k - 1)
+    coefs = (math.sqrt(1 - p),) + (math.sqrt(w),) * (len(emb) - 1)
+    out = np.zeros(rho.shape, dtype=np.result_type(rho.dtype, complex))
+    for c, E in zip(coefs, emb):        # c*_embed(P) == _embed(c*P) exactly: embedding is a pure placement, no summed index
+        Ec = c * E
+        out += Ec @ rho @ Ec.conj().T
+    tracker.set(joint, out)
 
 
 def depol_p_from_rb(r: float, k: int) -> float:

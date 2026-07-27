@@ -4,6 +4,8 @@ from functools import lru_cache
 
 import numpy as np
 
+_I2 = np.eye(2, dtype=complex)   # shared identity factor for embedding; read-only, never mutate
+
 def _embed(op: np.ndarray, indices: tuple[int, ...], n: int) -> np.ndarray:
     """Embed a k-qubit operator op into the n qubit space: it acts on the qubits at indices and I on rest"""
 
@@ -17,10 +19,9 @@ def _embed(op: np.ndarray, indices: tuple[int, ...], n: int) -> np.ndarray:
     in_lbl = list(range(n, 2 * n))
     o = op.reshape([2] * k +[2] * k)
     operands = [o, [out_lbl[i] for i in indices]+ [in_lbl[i] for i in indices]]
-    eye = np.eye(2, dtype=complex)
     for i in range(n):
         if i not in indices:
-            operands += [eye, [out_lbl[i], in_lbl[i]]]
+            operands += [_I2, [out_lbl[i], in_lbl[i]]]
     
     return np.einsum(*operands, out_lbl + in_lbl).reshape(2**n, 2**n)
 
